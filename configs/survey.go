@@ -4,15 +4,7 @@ import (
 	survey "github.com/AlecAivazis/survey/v2"
 )
 
-type Answers struct {
-	Type         string // survey will match the question and field names
-	Name         string // or you can tag fields to match a specific name
-	Auth         string
-	Port         string
-	DatabaseType string
-}
-
-func InitSurvey() (answers Answers, err error) {
+func InitSurvey() (answers Application, err error) {
 	// the questions to ask
 	qs := []*survey.Question{
 		{
@@ -60,7 +52,7 @@ func InitSurvey() (answers Answers, err error) {
 		},
 	}
 	// the answers will be written to this struct
-	answers = Answers{}
+	answers = Application{}
 	// perform the questions
 	err = survey.Ask(qs, &answers)
 	return

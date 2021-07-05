@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/andiwork/andictl/configs"
+	"github.com/andiwork/andictl/pkg/app"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -35,9 +36,7 @@ var rootCmd = &cobra.Command{
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 		// If a config file is found, read it in.
-		if err := viper.ReadInConfig(); err == nil {
-			fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
-		} else {
+		if err := viper.ReadInConfig(); err != nil {
 			// perform the questions
 			os.Create(".andictl.yaml")
 			answers, err := configs.InitSurvey()
@@ -56,6 +55,11 @@ var rootCmd = &cobra.Command{
 				}
 			}
 		}
+		if err := viper.Unmarshal(&configs.App); err != nil {
+			fmt.Printf("couldn't read config: %s", err)
+		}
+		//Generate app skeleton
+		app.Generate()
 
 	},
 }
