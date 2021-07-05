@@ -12,8 +12,8 @@ type GeneralConfig struct {
 	App Application `mapstructure:"application"`
 }
 
-var App GeneralConfig
+var AppConfs GeneralConfig
 
 func init() {
-	App = GeneralConfig{}
+	AppConfs = GeneralConfig{}
 }

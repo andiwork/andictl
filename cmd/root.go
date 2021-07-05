@@ -55,7 +55,7 @@ var rootCmd = &cobra.Command{
 				}
 			}
 		}
-		if err := viper.Unmarshal(&configs.App); err != nil {
+		if err := viper.Unmarshal(&configs.AppConfs); err != nil {
 			fmt.Printf("couldn't read config: %s", err)
 		}
 		//Generate app skeleton
