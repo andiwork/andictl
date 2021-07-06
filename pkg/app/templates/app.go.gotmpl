@@ -1,0 +1,55 @@
+package configs
+
+import (
+	"flag"
+	"fmt"
+
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
+)
+
+type Database struct {
+	Driver   string
+	Host     string
+	Port     string
+	Name     string
+	Username string
+	Password string
+}
+
+type AppConfig struct {
+	Name    string
+	Port    string
+	Env     string
+	DevMode bool
+	Db      Database `mapstructure:"database"`
+}
+
+func init() {
+	viper.SetDefault("env", "")
+	flag.String("env", "", "app environment.")
+	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+	pflag.Parse()
+	viper.BindPFlags(pflag.CommandLine)
+}
+
+func InitAppConfigs() (config AppConfig) {
+	env := viper.GetString("env")
+	viper.AddConfigPath("./configs")
+	viper.SetConfigName("app")
+	if err := viper.ReadInConfig(); err != nil {
+		panic(err)
+	}
+	if env != "" {
+		viper.SetConfigName(env)
+		viper.MergeInConfig()
+	} else {
+		viper.Set("env", "default")
+	}
+
+	if err := viper.Unmarshal(&config); err != nil {
+		fmt.Printf("couldn't read config: %s", err)
+	}
+	GormConfigs(config)
+	return
+}

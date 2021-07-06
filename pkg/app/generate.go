@@ -29,14 +29,32 @@ func Generate() {
 	if _, err := os.Stat("go.mod"); os.IsNotExist(err) {
 		ExecShellCommand("go", []string{"mod", "init", configs.AppConfs.App.Name})
 	}
-	ExecShellCommand("go", []string{"mod", "tidy"})
+	defer ExecShellCommand("go", []string{"mod", "tidy"})
+	//Generate main.go
+	data, _ := mainGoTmpl.ReadFile("templates/main.go.gotmpl")
+	processTmplFiles(".", "main.go", data, false)
+	// Generate configs
+	// package files
+	genFolder := "configs"
 
-	// Generate configs files
-	data, _ := appTmpl.ReadFile("templates/app.yaml.tmpl")
-	processTmplFiles("configs", "app.yaml", data)
+	data, _ = appTmpl.ReadFile("templates/app.yaml.gotmpl")
+	processTmplFiles(genFolder, "app.yaml", data, false)
 
-	data, _ = prodTmpl.ReadFile("templates/prod.yaml.tmpl")
-	processTmplFiles("configs", "prod.yaml", data)
+	data, _ = prodTmpl.ReadFile("templates/prod.yaml.gotmpl")
+	processTmplFiles(genFolder, "prod.yaml", data, false)
+
+	data, _ = appGoTmpl.ReadFile("templates/app.go.gotmpl")
+	//fmt.Printf("Total bytes: %s\n", data)
+	processTmplFiles(genFolder, "app.go", data, false)
+
+	data, _ = gormGoTmpl.ReadFile("templates/gorm.go.gotmpl")
+	processTmplFiles(genFolder, "gorm.go", data, false)
+
+	data, _ = restfulGoTmpl.ReadFile("templates/restful.go.gotmpl")
+	processTmplFiles(genFolder, "restful.go", data, false)
+
+	data, _ = swaggerGoTmpl.ReadFile("templates/swagger.go.gotmpl")
+	processTmplFiles(genFolder, "swagger.go", data, false)
 
 }
 
@@ -59,7 +77,7 @@ func ExecShellCommand(bin string, args []string) {
 
 }
 
-func processTmplFiles(folder string, dstFileName string, tmplData []byte) {
+func processTmplFiles(folder string, dstFileName string, tmplData []byte, debug bool) {
 	tmpl := template.New("app-conf").Funcs(template.FuncMap{
 		"uuidWithOutHyphen": uuidWithOutHyphen,
 	})
@@ -69,14 +87,18 @@ func processTmplFiles(folder string, dstFileName string, tmplData []byte) {
 		return
 	}
 	filePath := folder + "/" + dstFileName
-	file, err := os.Create(filePath)
-	if err != nil {
-		log.Fatal("Error creating file. ", err)
-		return
+	if debug {
+		err = tmpl.Execute(os.Stderr, configs.AppConfs.App)
+	} else {
+		file, err := os.Create(filePath)
+		if err != nil {
+			log.Fatal("Error creating file. ", err)
+			return
+		}
+
+		err = tmpl.Execute(file, configs.AppConfs.App)
+
 	}
-
-	err = tmpl.Execute(file, configs.AppConfs.App)
-
 	if err != nil {
 		log.Fatal("Error executing template. ", filePath, err)
 	}

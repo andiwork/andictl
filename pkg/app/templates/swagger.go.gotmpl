@@ -1,0 +1,63 @@
+package configs
+
+import (
+	"net/http"
+
+	restfulspec "github.com/emicklei/go-restful-openapi/v2"
+	restful "github.com/emicklei/go-restful/v3"
+	"github.com/go-openapi/spec"
+)
+
+func newSwaggerConf() (config restfulspec.Config, cors restful.CrossOriginResourceSharing) {
+
+	config = restfulspec.Config{
+		WebServices:                   restful.RegisteredWebServices(), // you control what services are visible
+		APIPath:                       "/apidocs.json",
+		PostBuildSwaggerObjectHandler: enrichSwaggerObject}
+
+	// CORS
+	cors = restful.CrossOriginResourceSharing{
+		AllowedHeaders: []string{"Content-Type", "Accept", "Authorization"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		CookiesAllowed: false,
+		Container:      restful.DefaultContainer}
+	return
+}
+func enrichSwaggerObject(swo *spec.Swagger) {
+	swo.Info = &spec.Info{
+		InfoProps: spec.InfoProps{
+			Title:       "UserService",
+			Description: "Resource for managing Users",
+			Contact: &spec.ContactInfo{
+				ContactInfoProps: spec.ContactInfoProps{
+					Name:  "john",
+					Email: "john@doe.rp",
+					URL:   "http://johndoe.org",
+				},
+				VendorExtensible: spec.VendorExtensible{},
+			},
+			License: &spec.License{
+				LicenseProps: spec.LicenseProps{
+					Name: "MIT",
+					URL:  "http://mit.org",
+				},
+			},
+			Version: "1.0.0",
+		},
+	}
+	swo.Tags = []spec.Tag{spec.Tag{TagProps: spec.TagProps{
+		Name:        "users",
+		Description: "Managing users"}}}
+}
+
+func swaggerHandler(w http.ResponseWriter, req *http.Request) {
+	// remove/add not default ports from req.Host == req.URL.Path
+	openapi := "http://" + req.Host
+	/*
+		if len(req.URL.RawQuery) > 0 {
+			target += "?" + req.URL.RawQuery
+		}
+	*/
+	url := "http://" + req.Host + apiDocsPath + "?url=" + openapi + "/apidocs.json"
+	http.Redirect(w, req, url, http.StatusTemporaryRedirect)
+}

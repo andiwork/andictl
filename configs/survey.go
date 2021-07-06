@@ -20,7 +20,7 @@ func InitSurvey() (answers Application, err error) {
 			Name: "name",
 			Prompt: &survey.Input{
 				Message: "What is the name of your application?",
-				Default: "andictl",
+				Default: "andiapp",
 			},
 			Validate: survey.Required,
 		},

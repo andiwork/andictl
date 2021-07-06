@@ -1,0 +1,17 @@
+package main
+
+import (
+	"log"
+	"{{.Name}}/configs"
+	"net/http"
+)
+
+func main() {
+	app := configs.InitAppConfigs()
+	//configs.InitWebservices()
+	log.Printf("Application name: %s\n", app.Name)
+	log.Printf("Environment:  %s\n", app.Env)
+	log.Printf("Starting server at port %s\n.", app.Port)
+	server := &http.Server{Addr: ":" + app.Port}
+	log.Fatal(server.ListenAndServe())
+}

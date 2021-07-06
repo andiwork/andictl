@@ -1,0 +1,19 @@
+package configs
+
+import (
+	"net/http"
+
+	restfulspec "github.com/emicklei/go-restful-openapi/v2"
+	restful "github.com/emicklei/go-restful/v3"
+)
+
+var apiDocsPath = "/apidocs/"
+
+func InitWebservices() {
+	// Get swagger configurations
+	config, cors := newSwaggerConf()
+	restful.DefaultContainer.Add(restfulspec.NewOpenAPIService(config))
+	restful.DefaultContainer.Filter(cors.Filter)
+	http.HandleFunc("/swagger/", swaggerHandler)
+	http.Handle(apiDocsPath, http.StripPrefix(apiDocsPath, http.FileServer(http.Dir("./docs/swagger-ui-3.51.1"))))
+}

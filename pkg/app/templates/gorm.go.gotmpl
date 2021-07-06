@@ -1,0 +1,67 @@
+package configs
+
+import (
+	"fmt"
+	"log"
+//	"{{.Name}}/pkg/ok"
+//	"{{.Name}}/pkg/toto"
+	"os"
+	"time"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+)
+
+var GormDb *gorm.DB
+var err error
+
+func migrateSchema() {
+	// Migrate ok package
+	//GormDb.AutoMigrate(ok.Migrate()...)
+	//GormDb.AutoMigrate(toto.Migrate()...)
+}
+
+func GormConfigs(app AppConfig) {
+
+	var newLogger logger.Interface
+	if app.DevMode {
+		newLogger = logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold:             time.Second, // Slow SQL threshold
+				LogLevel:                  logger.Info, // Log level
+				IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+				Colorful:                  false,       // Disable color
+			},
+		)
+	} else {
+		newLogger = logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold:             time.Second,  // Slow SQL threshold
+				LogLevel:                  logger.Error, // Log level
+				IgnoreRecordNotFoundError: true,         // Ignore ErrRecordNotFound error for logger
+				Colorful:                  false,        // Disable color
+			},
+		)
+	}
+
+	switch app.Db.Driver {
+	case "mysql":
+		dsn := fmt.Sprintf("user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local")
+		GormDb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogger})
+		break
+	case "postgres":
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable ", app.Db.Host, app.Db.Username, app.Db.Password, app.Db.Name, app.Db.Port)
+		GormDb, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: newLogger})
+		break
+	default:
+		panic("Supported driver: mysql and postgres")
+	}
+	if err != nil {
+		log.Fatalf("Database error", err)
+	}
+	migrateSchema()
+}
