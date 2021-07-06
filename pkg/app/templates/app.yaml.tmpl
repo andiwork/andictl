@@ -1,0 +1,12 @@
+name:  "{{.Name}}"
+port:  {{.Port}}
+devmode: true
+auth: {{.Auth }}
+{{ if .Auth }}{{.AuthType}}: {{ uuidWithOutHyphen }}{{ end }}
+database:
+  driver: "{{.DatabaseType}}"
+  host: "127.0.0.1"
+  {{ if eq .DatabaseType  "postgres" }}port: 5432{{ else }}port: 3306{{ end }}
+  name: "{{.Name}}"
+  username: "{{.Name}}"
+  password: "{{.Name}}"

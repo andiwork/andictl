@@ -43,12 +43,15 @@ var rootCmd = &cobra.Command{
 			if err != nil {
 				fmt.Println(err.Error())
 			} else {
-				fmt.Println("responseeee", answers)
 				viper.Set("application.name", answers.Name)
 				viper.Set("application.type", answers.Type)
 				viper.Set("application.port", answers.Port)
 				viper.Set("application.database-type", answers.DatabaseType)
-				viper.Set("application.auth", answers.Auth)
+				if answers.AuthType != "none" {
+					viper.Set("application.auth", true)
+					viper.Set("application.authType", answers.AuthType)
+				}
+
 				err := viper.WriteConfig()
 				if err != nil {
 					fmt.Println("Eror while writing config file:", err)

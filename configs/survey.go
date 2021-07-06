@@ -33,7 +33,7 @@ func InitSurvey() (answers Application, err error) {
 			Validate: survey.Required,
 		},
 		{
-			Name: "auth",
+			Name: "authType",
 			Prompt: &survey.Select{
 				Message: "Which type of authentication would you like to use?",
 				Options: []string{"none", "jwt", "oidc"},
