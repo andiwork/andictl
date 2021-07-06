@@ -9,23 +9,24 @@ import (
 
 	execute "github.com/alexellis/go-execute/pkg/v1"
 	"github.com/andiwork/andictl/configs"
+	"github.com/andiwork/andictl/utils"
 	"github.com/google/uuid"
 )
 
-var test = "test/"
+var appDir = "test/"
 
 func Generate() {
 
 	log.Println("les configs ======", configs.AppConfs)
 	// create app folder structure
 	// folder configs
-	os.MkdirAll(test+"configs", os.ModePerm)
+	os.MkdirAll(appDir+"configs", os.ModePerm)
 	// folder docs/swagger-ui
-	os.MkdirAll(test+"docs/swagger-ui", os.ModePerm)
+	os.MkdirAll(appDir+"docs/swagger-ui", os.ModePerm)
 	// folder pkg
-	os.MkdirAll(test+"pkg", os.ModePerm)
+	os.MkdirAll(appDir+"pkg", os.ModePerm)
 	// initialiaze go module
-	os.Chdir(test)
+	os.Chdir(appDir)
 	if _, err := os.Stat("go.mod"); os.IsNotExist(err) {
 		ExecShellCommand("go", []string{"mod", "init", configs.AppConfs.App.Name})
 	}
@@ -56,9 +57,24 @@ func Generate() {
 	data, _ = swaggerGoTmpl.ReadFile("templates/swagger.go.gotmpl")
 	processTmplFiles(genFolder, "swagger.go", data, false)
 
+	// Download swagger ui files
+	if _, err := os.Stat("docs/swagger-ui/dist"); os.IsNotExist(err) {
+
+		swagger, err := utils.DownloadFile("v3.51.1.tar.gz", "https://github.com/swagger-api/swagger-ui/archive/refs/tags/v3.51.1.tar.gz")
+		if err == nil {
+			log.Println("swagger: ", swagger)
+			//path, _ := os.Getwd()
+			//untar
+			ExecShellCommand("tar -xzf "+swagger+" -C /tmp", []string{})
+			ExecShellCommand("mv /tmp/swagger-ui-3.51.1/dist docs/swagger-ui", []string{})
+		} else {
+			panic(err)
+		}
+	}
 }
 
 func ExecShellCommand(bin string, args []string) {
+	log.Println("Executing : ", bin, args)
 	cmd := execute.ExecTask{
 		Command:     bin,
 		Args:        args,

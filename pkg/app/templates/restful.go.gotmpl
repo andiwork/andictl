@@ -15,5 +15,5 @@ func InitWebservices() {
 	restful.DefaultContainer.Add(restfulspec.NewOpenAPIService(config))
 	restful.DefaultContainer.Filter(cors.Filter)
 	http.HandleFunc("/swagger/", swaggerHandler)
-	http.Handle(apiDocsPath, http.StripPrefix(apiDocsPath, http.FileServer(http.Dir("./docs/swagger-ui-3.51.1"))))
+	http.Handle(apiDocsPath, http.StripPrefix(apiDocsPath, http.FileServer(http.Dir("./docs/swagger-ui/dist"))))
 }
