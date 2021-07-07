@@ -27,29 +27,29 @@ func Generate() {
 	defer ExecShellCommand("go", []string{"mod", "tidy"})
 	//Generate main.go
 	data, _ := mainGoTmpl.ReadFile("templates/main.go.gotmpl")
-	utils.ProcessTmplFiles(".", "main.go", data, false)
+	utils.ProcessTmplFiles(".", "main.go", data, configs.AppConfs.App, false)
 	// Generate configs
 	// package files
 	genFolder := "configs"
 
 	data, _ = appTmpl.ReadFile("templates/app.yaml.gotmpl")
-	utils.ProcessTmplFiles(genFolder, "app.yaml", data, false)
+	utils.ProcessTmplFiles(genFolder, "app.yaml", data, configs.AppConfs.App, false)
 
 	data, _ = prodTmpl.ReadFile("templates/prod.yaml.gotmpl")
-	utils.ProcessTmplFiles(genFolder, "prod.yaml", data, false)
+	utils.ProcessTmplFiles(genFolder, "prod.yaml", data, configs.AppConfs.App, false)
 
 	data, _ = appGoTmpl.ReadFile("templates/app.go.gotmpl")
 	//fmt.Printf("Total bytes: %s\n", data)
-	utils.ProcessTmplFiles(genFolder, "app.go", data, false)
+	utils.ProcessTmplFiles(genFolder, "app.go", data, configs.AppConfs.App, false)
 
 	data, _ = gormGoTmpl.ReadFile("templates/gorm.go.gotmpl")
-	utils.ProcessTmplFiles(genFolder, "gorm.go", data, false)
+	utils.ProcessTmplFiles(genFolder, "gorm.go", data, configs.AppConfs.App, false)
 
 	data, _ = restfulGoTmpl.ReadFile("templates/restful.go.gotmpl")
-	utils.ProcessTmplFiles(genFolder, "restful.go", data, false)
+	utils.ProcessTmplFiles(genFolder, "restful.go", data, configs.AppConfs.App, false)
 
 	data, _ = swaggerGoTmpl.ReadFile("templates/swagger.go.gotmpl")
-	utils.ProcessTmplFiles(genFolder, "swagger.go", data, false)
+	utils.ProcessTmplFiles(genFolder, "swagger.go", data, configs.AppConfs.App, false)
 
 	// Download swagger ui files
 	if _, err := os.Stat("docs/swagger-ui/dist"); os.IsNotExist(err) {

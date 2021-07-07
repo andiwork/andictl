@@ -11,19 +11,19 @@ import (
 	"github.com/metal3d/go-slugify"
 )
 
-func ProcessTmplFiles(folder string, dstFileName string, tmplData []byte, debug bool) {
+func ProcessTmplFiles(folder string, dstFileName string, tmplFile []byte, tmplData interface{}, debug bool) {
 	tmpl := template.New("app-conf").Funcs(template.FuncMap{
 		"uuidWithOutHyphen": UuidWithOutHyphen,
 		"andictlSlugify":    AndictlSlugify,
 	})
-	tmpl, err := tmpl.Parse(string(tmplData))
+	tmpl, err := tmpl.Parse(string(tmplFile))
 	if err != nil {
 		log.Fatal("Error Parsing template: ", err)
 		return
 	}
 	filePath := folder + "/" + dstFileName
 	if debug {
-		err = tmpl.Execute(os.Stderr, configs.AppConfs.App)
+		err = tmpl.Execute(os.Stderr, tmplData)
 	} else {
 		file, err := os.Create(filePath)
 		if err != nil {
