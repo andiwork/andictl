@@ -13,20 +13,18 @@ import (
 	"github.com/google/uuid"
 )
 
-var appDir = "test/"
-
 func Generate() {
 
 	log.Println("les configs ======", configs.AppConfs)
 	// create app folder structure
 	// folder configs
-	os.MkdirAll(appDir+"configs", os.ModePerm)
+	os.MkdirAll(configs.AppDir+"configs", os.ModePerm)
 	// folder docs/swagger-ui
-	os.MkdirAll(appDir+"docs/swagger-ui", os.ModePerm)
-	// folder pkg
-	os.MkdirAll(appDir+"pkg", os.ModePerm)
+	os.MkdirAll(configs.AppDir+"docs/swagger-ui", os.ModePerm)
+	// folder pkg/middleware
+	os.MkdirAll(configs.AppDir+"pkg/middleware", os.ModePerm)
 	// initialiaze go module
-	os.Chdir(appDir)
+	os.Chdir(configs.AppDir)
 	if _, err := os.Stat("go.mod"); os.IsNotExist(err) {
 		ExecShellCommand("go", []string{"mod", "init", configs.AppConfs.App.Name})
 	}

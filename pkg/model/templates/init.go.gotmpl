@@ -1,0 +1,6 @@
+package {{.Package}}
+
+func Migrate() (models []interface{}) {
+	models = append(models, new(User))
+	return
+}

@@ -1,0 +1,54 @@
+package user
+
+import (
+	"log"
+
+	utils "github.com/andiwork/gorm-utils"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+type User struct {
+	utils.Model
+	Name string
+	Age  int
+}
+
+// AddUser insert a new User into database and returns
+// last inserted Id on success.
+func AddUser(m *User, db *gorm.DB) (err error) {
+	err = db.Create(m).Error
+	return
+}
+
+// GetUserById retrieves User by Id. Returns error if
+// Id doesn't exist
+func GetUserById(id uuid.UUID, db *gorm.DB) (model User, err error) {
+	err = db.First(&model, "id = ?", id).Error
+	return
+}
+
+// GetAllUser retrieves all User matches certain condition. Returns empty list if
+// no records exist
+func GetAllUser(query map[string]string, order string,
+	offset int, limit int, db *gorm.DB) (models []User, err error) {
+	log.Println("query :", query, " order:", order, " limit:", limit, "offset:", offset)
+	err = db.Where(query).Order(order).
+		Limit(limit).Offset(offset).
+		Find(&models).Error
+	return
+}
+
+// UpdateUser updates User by Id and returns error if
+// the record to be updated doesn't exist
+func UpdateUserById(model *User, db *gorm.DB) (err error) {
+	err = db.Save(model).Error
+	return
+}
+
+// DeleteUser deletes User by Id and returns error if
+// the record to be deleted doesn't exist
+func DeleteUser(id uuid.UUID, db *gorm.DB) (err error) {
+	err = db.Delete(new(User), id).Error
+	return
+}

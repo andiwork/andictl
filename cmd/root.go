@@ -21,6 +21,7 @@ import (
 
 	"github.com/andiwork/andictl/configs"
 	"github.com/andiwork/andictl/pkg/app"
+	slugify "github.com/metal3d/go-slugify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -30,8 +31,8 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "andictl",
-	Short: "Andictl is a  tool for managing your Andi Web Application.",
-	Long:  `Andictl is a  tool for managing your Andi Web Application.`,
+	Short: "andictl is a  tool for managing your Andi Web Application.",
+	Long:  `andictl is a  tool for managing your Andi Web Application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
@@ -43,7 +44,8 @@ var rootCmd = &cobra.Command{
 			if err != nil {
 				fmt.Println(err.Error())
 			} else {
-				viper.Set("application.name", answers.Name)
+				appName := slugify.Marshal(answers.Name)
+				viper.Set("application.name", appName)
 				viper.Set("application.type", answers.Type)
 				viper.Set("application.port", answers.Port)
 				viper.Set("application.database-type", answers.DatabaseType)
