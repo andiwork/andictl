@@ -1,0 +1,75 @@
+package middleware
+
+import (
+	"fmt"
+	"log"
+	"strings"
+
+	jwt "github.com/dgrijalva/jwt-go"
+	restful "github.com/emicklei/go-restful/v3"
+	"github.com/spf13/viper"
+)
+
+var (
+	jwtkey  []byte
+)
+
+func init() {
+	jwtkey = []byte(viper.GetString("jwtkey"))
+}
+
+// Check whether token is valid
+func checkToken(tokenString string) (bool, jwt.MapClaims) {
+
+	kv := strings.Split(tokenString, " ")
+	if len(kv) != 2 || kv[0] != "Bearer" {
+		return false, nil
+	}
+
+	claims := jwt.MapClaims{}
+	token, err := jwt.ParseWithClaims(kv[1], claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtkey), nil
+	})
+
+	if token.Valid {
+		for key, val := range claims {
+			fmt.Printf("Key: %v, value: %v\n", key, val)
+		}
+		return true, claims
+	} else if ve, ok := err.(*jwt.ValidationError); ok {
+		if ve.Errors&jwt.ValidationErrorMalformed != 0 {
+			log.Println("That's not even a token")
+		} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
+			// Token is either expired or not active yet
+			log.Println("Timing is everything")
+		} else if jwt.ValidationErrorIssuedAt != 0 {
+			/*
+				for key, val := range claims {
+					fmt.Printf("Key: %v, value: %v\n", key, val)
+				}*/
+			return true, claims
+		} else {
+			log.Println("ValidationError couldn't handle this token:", err)
+		}
+	} else {
+		log.Println("Couldn't handle this token:", err)
+	}
+
+	return false, nil
+}
+func AuthJWT(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
+	authHeader := req.HeaderParameter("Authorization")
+	b, claims := checkToken(authHeader)
+	if !b {
+		resp.WriteErrorString(401, "401: Not Authorized")
+		return
+	} else {
+		if viper.GetBool("devmode") {
+			for k, v := range claims {
+				log.Println("claims k,v :", k, v)
+			}
+		}
+
+	}
+	chain.ProcessFilter(req, resp)
+}

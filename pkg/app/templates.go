@@ -22,3 +22,9 @@ var swaggerGoTmpl embed.FS
 
 //go:embed templates/main.go.gotmpl
 var mainGoTmpl embed.FS
+
+//go:embed templates/jwt.go.gotmpl
+var jwtGoTmpl embed.FS
+
+//go:embed templates/authz.go.gotmpl
+var authzGoTmpl embed.FS

@@ -33,7 +33,6 @@ func Generate() {
 	//Generate main.go
 	data, _ := mainGoTmpl.ReadFile("templates/main.go.gotmpl")
 	utils.ProcessTmplFiles(".", "main.go", data, configs.AppConfs, false)
-	fmt.Println("create ", "main.go")
 
 	// Generate configs
 	// package files
@@ -41,27 +40,29 @@ func Generate() {
 
 	data, _ = appTmpl.ReadFile("templates/app.yaml.gotmpl")
 	utils.ProcessTmplFiles(genFolder, "app.yaml", data, configs.AppConfs, false)
-	fmt.Println("create ", genFolder+"/app.yaml")
 
 	data, _ = prodTmpl.ReadFile("templates/prod.yaml.gotmpl")
 	utils.ProcessTmplFiles(genFolder, "prod.yaml", data, configs.AppConfs, false)
-	fmt.Println("create ", genFolder+"/prod.yaml")
 
 	data, _ = appGoTmpl.ReadFile("templates/app.go.gotmpl")
 	utils.ProcessTmplFiles(genFolder, "app.go", data, configs.AppConfs, false)
-	fmt.Println("create ", genFolder+"/app.go")
 
 	data, _ = gormGoTmpl.ReadFile("templates/gorm.go.gotmpl")
 	utils.ProcessTmplFiles(genFolder, "gorm.go", data, configs.AppConfs, false)
-	fmt.Println("create ", genFolder+"/gorm.go")
 
 	data, _ = restfulGoTmpl.ReadFile("templates/restful.go.gotmpl")
 	utils.ProcessTmplFiles(genFolder, "restful.go", data, configs.AppConfs, false)
-	fmt.Println("create ", genFolder+"/restful.go")
 
 	data, _ = swaggerGoTmpl.ReadFile("templates/swagger.go.gotmpl")
 	utils.ProcessTmplFiles(genFolder, "swagger.go", data, configs.AppConfs, false)
-	fmt.Println("create ", genFolder+"/swagger.go")
+
+	data, _ = authzGoTmpl.ReadFile("templates/authz.go.gotmpl")
+	utils.ProcessTmplFiles("pkg/middleware", "authz.go", data, nil, false)
+
+	if configs.AppConfs.App.AuthType == "jwt" {
+		data, _ = jwtGoTmpl.ReadFile("templates/jwt.go.gotmpl")
+		utils.ProcessTmplFiles("pkg/middleware", "jwt.go", data, nil, false)
+	}
 
 	// Download swagger ui files
 	if _, err := os.Stat("docs/swagger-ui/dist"); os.IsNotExist(err) {

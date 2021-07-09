@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"os"
@@ -34,6 +35,7 @@ func ProcessTmplFiles(folder string, dstFileName string, tmplFile []byte, tmplDa
 		}
 
 		err = tmpl.Execute(file, tmplData)
+		fmt.Println("create ", filePath)
 
 	}
 	if err != nil {

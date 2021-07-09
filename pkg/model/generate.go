@@ -24,19 +24,18 @@ func Generate(model configs.AndiModel) {
 
 	// Generate model files
 	data, _ := modelGoTmpl.ReadFile("templates/model.go.gotmpl")
-	utils.ProcessTmplFiles(packPath, "model.go", data, model, false)
-	fmt.Println("create ", packPath+"/model.go")
+	utils.ProcessTmplFiles(packPath, modelSlug+"_model.go", data, model, false)
 
 	data, _ = modelResourceGoTmpl.ReadFile("templates/model_resource.go.gotmpl")
 	utils.ProcessTmplFiles(packPath, modelSlug+"_resource.go", data, model, false)
-	fmt.Println("create ", packPath+"/"+modelSlug+"_resource.go")
+
+	fmt.Println("======= TODO ======")
 
 	initGo := packPath + "/init.go"
-	fmt.Println("======= TODO ======")
 	if _, err := os.Stat(initGo); os.IsNotExist(err) {
 		data, _ = initGoTmpl.ReadFile("templates/init.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, "init.go", data, model, false)
-		fmt.Println("create ", packPath+"/init.go")
+		//fmt.Println("create ", packPath+"/init.go")
 	} else {
 		// register new models
 		register := fmt.Sprintf("models = append(models, new(%s))", strings.Title(model.Name))
@@ -47,7 +46,7 @@ func Generate(model configs.AndiModel) {
 
 	// import new package in gorm.go
 	gormFile := configs.AppDir + "configs/gorm.go"
-	importPackage := fmt.Sprintf("%s/pkg/%s", model.Module, model.Package)
+	importPackage := fmt.Sprintf("\"%s/pkg/%s\"", model.Module, model.Package)
 	fmt.Println("Import: ", importPackage, " before //andi-import-do-not-remove in file: ", gormFile)
 
 	// register migration new model in gorm.go
@@ -60,5 +59,7 @@ func Generate(model configs.AndiModel) {
 
 	createService := fmt.Sprintf("restful.DefaultContainer.Add(%s.New(GormDb).WebService())", strings.ToLower(model.Name))
 	fmt.Println("Add: ", createService, " before //andi-add-restful-webservice in file: ", restfulFile)
+	fmt.Println("==")
+	fmt.Println("Execute: go mod tidy")
 	fmt.Println("===================")
 }

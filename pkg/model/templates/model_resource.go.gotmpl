@@ -98,7 +98,7 @@ func (u {{ .Name | title }}Resource) findAll{{ .Name | title }}s(request *restfu
 	if order == "" {
 		order = "created_at desc"
 	}
-	list, err := GetAllUser(query, order, offset, limit, u.db)
+	list, err := GetAll{{ .Name | title }}(query, order, offset, limit, u.db)
 	if err != nil {
 		response.WriteError(http.StatusInternalServerError, err)
 	}
@@ -109,7 +109,7 @@ func (u {{ .Name | title }}Resource) findAll{{ .Name | title }}s(request *restfu
 //
 func (u {{ .Name | title }}Resource) find{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	uuid, _ := uuid.Parse(request.PathParameter("id"))
-	{{ .Name | title }}, err := GetUserById(uuid, u.db)
+	{{ .Name | title }}, err := Get{{ .Name | title }}ById(uuid, u.db)
 
 	if err == gorm.ErrRecordNotFound {
 		response.WriteErrorString(http.StatusNotFound, "{{ .Name | title }} could not be found.")
@@ -136,6 +136,7 @@ func (u *{{ .Name | title }}Resource) update{{ .Name | title }}(request *restful
 func (u *{{ .Name | title }}Resource) create{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	{{ .Name | toLower }} := {{ .Name | title }}{}
 	err := request.ReadEntity(&{{ .Name | toLower }})
+	Add{{ .Name | title }}(&{{ .Name | toLower }}, u.db)
 	if err == nil {
 		response.WriteHeaderAndEntity(http.StatusCreated, {{ .Name | toLower }})
 	} else {
