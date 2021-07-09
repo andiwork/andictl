@@ -3,24 +3,20 @@ package configs
 import (
 	"fmt"
 	"log"
-//	"{{.App.Name}}/pkg/ok"
-//	"{{.App.Name}}/pkg/toto"
 	"os"
 	"time"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	//andi-import-package-do-not-remove
 )
 
 var GormDb *gorm.DB
 var err error
 
 func migrateSchema() {
-	// Migrate ok package
-	//GormDb.AutoMigrate(ok.Migrate()...)
-	//GormDb.AutoMigrate(toto.Migrate()...)
+	//andi-auto-migrate-do-not-remove
 }
 
 func GormConfigs(app AppConfig) {
@@ -50,7 +46,7 @@ func GormConfigs(app AppConfig) {
 
 	switch app.Db.Driver {
 	case "mysql":
-		dsn := fmt.Sprintf("user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local")
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",app.Db.Username, app.Db.Password, app.Db.Host, app.Db.Port, app.Db.Name)
 		GormDb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogger})
 		break
 	case "postgres":

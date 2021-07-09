@@ -2,5 +2,6 @@ package {{ .Package }}
 
 func Migrate() (models []interface{}) {
 	models = append(models, new({{ .Name | title }}))
+	//andi-add-model-to-migrate
 	return
 }

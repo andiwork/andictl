@@ -13,7 +13,7 @@ type GeneralConfig struct {
 	App Application `mapstructure:"application"`
 }
 
-var AppDir = "test/"
+var AppDir = "./"
 
 var AppConfs GeneralConfig
 

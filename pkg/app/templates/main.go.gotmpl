@@ -12,6 +12,7 @@ func main() {
 	log.Printf("Application name: %s\n", app.Name)
 	log.Printf("Environment:  %s\n", app.Env)
 	log.Printf("Starting server at port %s\n.", app.Port)
+	log.Printf("Swagger documentation at http://127.0.0.1:%s/swagger", app.Port)
 	server := &http.Server{Addr: ":" + app.Port}
 	log.Fatal(server.ListenAndServe())
 }
