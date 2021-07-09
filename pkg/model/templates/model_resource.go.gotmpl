@@ -1,4 +1,4 @@
-package user
+package {{ .Package }}
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	mid "my-go-layout/pkg/middleware"
+	mid "{{.Module}}/pkg/middleware"
 
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	restful "github.com/emicklei/go-restful/v3"
@@ -14,71 +14,71 @@ import (
 	"gorm.io/gorm"
 )
 
-// UserResource is the REST layer to the User domain
-type UserResource struct {
+// {{ .Name | title }}Resource is the REST layer to the {{ .Name | title }} domain
+type {{ .Name | title }}Resource struct {
 	db *gorm.DB
 }
 
-func New(con *gorm.DB) UserResource {
-	return UserResource{db: con}
+func New(con *gorm.DB) {{ .Name | title }}Resource {
+	return {{ .Name | title }}Resource{db: con}
 }
 
-// WebService creates a new service that can handle REST requests for User resources.
-func (u UserResource) WebService() *restful.WebService {
+// WebService creates a new service that can handle REST requests for {{ .Name | title }} resources.
+func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 	ws := new(restful.WebService)
 	ws.
-		Path("/users").
+		Path("/{{.ApiVersion}}/{{ .Name | toLower }}s").
 		Consumes(restful.MIME_JSON, restful.MIME_XML).
 		Produces(restful.MIME_JSON, restful.MIME_XML) // you can specify this per route as well
 
-	tags := []string{"users"}
+	tags := []string{"{{ .Name | toLower }}s"}
 
-	ws.Route(ws.GET("/").To(u.findAllUsers).
+	ws.Route(ws.GET("/").To(u.findAll{{ .Name | title }}s).
 		// docs
-		Doc("get all users").
+		Doc("get all {{ .Name | toLower }}s").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Param(ws.QueryParameter("query", "Filter. e.g. col1:v1,col2:v2").DataType("string").Required(false)).
 		Param(ws.QueryParameter("query", "Filter. e.g. col1:v1,col2:v2").DataType("string").Required(false)).
 		Param(ws.QueryParameter("order", "Order. e.g. col1 desc,col2").DataType("string").Required(false)).
 		Param(ws.QueryParameter("offset", "Start position of result set. Must be an integer").DataType("string").Required(false)).
 		Param(ws.QueryParameter("limit", "Limit the size of result set. Must be an integer").DataType("string").Required(false)).
-		Writes([]User{}).
-		Returns(200, "OK", []User{}))
+		Writes([]{{ .Name | title }}{}).
+		Returns(200, "OK", []{{ .Name | title }}{}))
 
 	ws.Route(ws.GET("/{id}").Filter(mid.AuthzMiddleware).
-		To(u.findUser).
+		To(u.find{{ .Name | title }}).
 		// docs
-		Doc("get a user").
-		Param(ws.PathParameter("id", "identifier of the user").DataType("string")).
+		Doc("get a {{ .Name | title }}").
+		Param(ws.PathParameter("id", "identifier of the {{ .Name | title }}").DataType("string")).
 		Metadata(restfulspec.KeyOpenAPITags, tags).
-		Writes(User{}). // on the response
-		Returns(200, "OK", User{}).
+		Writes({{ .Name | title }}{}). // on the response
+		Returns(200, "OK", {{ .Name | title }}{}).
 		Returns(404, "Not Found", nil))
 
-	ws.Route(ws.PUT("/").To(u.updateUser).
+	ws.Route(ws.PUT("/").To(u.update{{ .Name | title }}).
 		// docs
-		Doc("update a user").
+		Doc("update a {{ .Name | title }}").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
-		Reads(User{})) // from the request
+		Reads({{ .Name | title }}{})) // from the request
 
-	ws.Route(ws.POST("").To(u.createUser).
+	ws.Route(ws.POST("").To(u.create{{ .Name | title }}).
 		// docs
-		Doc("create a user").
+		Doc("create a {{ .Name | title }}").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
-		Reads(User{})) // from the request
+		Reads({{ .Name | title }}{})) // from the request
 
-	ws.Route(ws.DELETE("/{id}").To(u.removeUser).
+	ws.Route(ws.DELETE("/{id}").To(u.remove{{ .Name | title }}).
 		// docs
-		Doc("delete a user").
+		Doc("delete a {{ .Name | title }}").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
-		Param(ws.PathParameter("id", "identifier of the user").DataType("string")))
+		Param(ws.PathParameter("id", "identifier of the {{ .Name | title }}").DataType("string")))
 
 	return ws
 }
 
-// GET http://localhost:8080/users
+// GET http://localhost:8080/{{ .Name | toLower }}s
 //
-func (u UserResource) findAllUsers(request *restful.Request, response *restful.Response) {
+func (u {{ .Name | title }}Resource) findAll{{ .Name | title }}s(request *restful.Request, response *restful.Response) {
 	var query = make(map[string]string)
 	queryString := request.QueryParameter("query")
 	// query: k:v,k:v
@@ -105,51 +105,49 @@ func (u UserResource) findAllUsers(request *restful.Request, response *restful.R
 	response.WriteEntity(list)
 }
 
-// GET http://localhost:8080/users/1
+// GET http://localhost:8080/{{ .Name | toLower }}s/1
 //
-func (u UserResource) findUser(request *restful.Request, response *restful.Response) {
+func (u {{ .Name | title }}Resource) find{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	uuid, _ := uuid.Parse(request.PathParameter("id"))
-	user, err := GetUserById(uuid, u.db)
+	{{ .Name | title }}, err := GetUserById(uuid, u.db)
 
 	if err == gorm.ErrRecordNotFound {
-		response.WriteErrorString(http.StatusNotFound, "User could not be found.")
+		response.WriteErrorString(http.StatusNotFound, "{{ .Name | title }} could not be found.")
 	} else {
-		response.WriteEntity(user)
+		response.WriteEntity({{ .Name | title }})
 	}
 }
 
-// PUT http://localhost:8080/users
+// PUT http://localhost:8080/{{ .Name | toLower }}s
 //
-func (u *UserResource) updateUser(request *restful.Request, response *restful.Response) {
-	var user User
-	//usr := new(User)
-	err := request.ReadEntity(&user)
-	err = UpdateUserById(&user, u.db)
+func (u *{{ .Name | title }}Resource) update{{ .Name | title }}(request *restful.Request, response *restful.Response) {
+	var {{ .Name | title }} {{ .Name | title }}
+	err := request.ReadEntity(&{{ .Name | title }})
+	err = Update{{ .Name | title }}ById(&{{ .Name | title }}, u.db)
 	if err == nil {
-		response.WriteEntity(user)
+		response.WriteEntity({{ .Name | title }})
 	} else {
 		response.WriteError(http.StatusInternalServerError, err)
 	}
 }
 
-// POST http://localhost:8080/users/1
+// POST http://localhost:8080/{{ .Name | toLower }}s/1
 //
-func (u *UserResource) createUser(request *restful.Request, response *restful.Response) {
-	//usr := User{ID: request.PathParameter("user-id")}
-	usr := User{}
-	err := request.ReadEntity(&usr)
+func (u *{{ .Name | title }}Resource) create{{ .Name | title }}(request *restful.Request, response *restful.Response) {
+	{{ .Name | toLower }} := {{ .Name | title }}{}
+	err := request.ReadEntity(&{{ .Name | toLower }})
 	if err == nil {
-		response.WriteHeaderAndEntity(http.StatusCreated, usr)
+		response.WriteHeaderAndEntity(http.StatusCreated, {{ .Name | toLower }})
 	} else {
 		response.WriteError(http.StatusInternalServerError, err)
 	}
 }
 
-// DELETE http://localhost:8080/users/1
+// DELETE http://localhost:8080/{{ .Name | toLower }}s/1
 //
-func (u *UserResource) removeUser(request *restful.Request, response *restful.Response) {
+func (u *{{ .Name | title }}Resource) remove{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	uuid, _ := uuid.Parse(request.PathParameter("id"))
-	err := DeleteUser(uuid, u.db)
+	err := Delete{{ .Name | title }}(uuid, u.db)
 	if err == nil {
 		response.WriteHeader(http.StatusCreated)
 	} else {

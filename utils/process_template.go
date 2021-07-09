@@ -6,17 +6,18 @@ import (
 	"os"
 	"strings"
 
-	"github.com/andiwork/andictl/configs"
 	"github.com/google/uuid"
 	"github.com/metal3d/go-slugify"
 )
 
 func ProcessTmplFiles(folder string, dstFileName string, tmplFile []byte, tmplData interface{}, debug bool) {
-	tmpl := template.New("app-conf").Funcs(template.FuncMap{
+	tmpl, err := template.New("andi").Funcs(template.FuncMap{
 		"uuidWithOutHyphen": UuidWithOutHyphen,
 		"andictlSlugify":    AndictlSlugify,
-	})
-	tmpl, err := tmpl.Parse(string(tmplFile))
+		"toLower":           strings.ToLower,
+		"title":             strings.Title,
+	}).Parse(string(tmplFile))
+	tmpl = template.Must(tmpl, err)
 	if err != nil {
 		log.Fatal("Error Parsing template: ", err)
 		return
@@ -26,12 +27,13 @@ func ProcessTmplFiles(folder string, dstFileName string, tmplFile []byte, tmplDa
 		err = tmpl.Execute(os.Stderr, tmplData)
 	} else {
 		file, err := os.Create(filePath)
+		defer file.Close()
 		if err != nil {
 			log.Fatal("Error creating file. ", err)
 			return
 		}
 
-		err = tmpl.Execute(file, configs.AppConfs.App)
+		err = tmpl.Execute(file, tmplData)
 
 	}
 	if err != nil {

@@ -1,4 +1,4 @@
-package user
+package {{.Package}}
 
 import (
 	"log"
@@ -7,31 +7,30 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
-
-type User struct {
+type {{ .Name | title }} struct {
 	utils.Model
 	Name string
 	Age  int
 }
 
-// AddUser insert a new User into database and returns
+// Add{{ .Name | title }} insert a new {{ .Name | title }} into database and returns
 // last inserted Id on success.
-func AddUser(m *User, db *gorm.DB) (err error) {
+func Add{{ .Name | title }}(m *{{ .Name | title }}, db *gorm.DB) (err error) {
 	err = db.Create(m).Error
 	return
 }
 
-// GetUserById retrieves User by Id. Returns error if
+// Get{{ .Name | title }}ById retrieves {{ .Name | title }} by Id. Returns error if
 // Id doesn't exist
-func GetUserById(id uuid.UUID, db *gorm.DB) (model User, err error) {
+func Get{{ .Name | title }}ById(id uuid.UUID, db *gorm.DB) (model {{ .Name | title }}, err error) {
 	err = db.First(&model, "id = ?", id).Error
 	return
 }
 
-// GetAllUser retrieves all User matches certain condition. Returns empty list if
+// GetAll{{ .Name | title }} retrieves all {{ .Name | title }} matches certain condition. Returns empty list if
 // no records exist
-func GetAllUser(query map[string]string, order string,
-	offset int, limit int, db *gorm.DB) (models []User, err error) {
+func GetAll{{ .Name | title }}(query map[string]string, order string,
+	offset int, limit int, db *gorm.DB) (models []{{ .Name | title }}, err error) {
 	log.Println("query :", query, " order:", order, " limit:", limit, "offset:", offset)
 	err = db.Where(query).Order(order).
 		Limit(limit).Offset(offset).
@@ -39,16 +38,16 @@ func GetAllUser(query map[string]string, order string,
 	return
 }
 
-// UpdateUser updates User by Id and returns error if
+// Update{{ .Name | title }} updates {{ .Name | title }} by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateUserById(model *User, db *gorm.DB) (err error) {
+func Update{{ .Name | title }}ById(model *{{ .Name | title }}, db *gorm.DB) (err error) {
 	err = db.Save(model).Error
 	return
 }
 
-// DeleteUser deletes User by Id and returns error if
+// Delete{{ .Name | title }} deletes {{ .Name | title }} by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteUser(id uuid.UUID, db *gorm.DB) (err error) {
-	err = db.Delete(new(User), id).Error
+func Delete{{ .Name | title }}(id uuid.UUID, db *gorm.DB) (err error) {
+	err = db.Delete(new({{ .Name | title }}), id).Error
 	return
 }

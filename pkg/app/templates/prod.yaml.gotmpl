@@ -1,12 +1,12 @@
-name:  "{{.Name}}"
-port:  {{.Port}}
+name:  "{{.App.Name}}"
+port:  {{.App.Port}}
 devmode: false
-auth: {{.Auth }}
-{{ if .Auth }}{{.AuthType}}: {{ uuidWithOutHyphen }}{{ end }}
+auth: {{.App.Auth }}
+{{ if .App.Auth }}{{.App.AuthType}}: {{ uuidWithOutHyphen }}{{ end }}
 database:
-  driver: "{{.DatabaseType}}"
+  driver: "{{.App.DatabaseType}}"
   host: "127.0.0.1"
-  {{ if eq .DatabaseType  "postgres" }}port: 5432{{ else }}port: 3306{{ end }}
-  name: "{{.Name}}"
-  username: "{{.Name}}"
-  password: "{{.Name}}"
+  {{ if eq .App.DatabaseType  "postgres" }}port: 5432{{ else }}port: 3306{{ end }}
+  name: "{{.App.Name}}"
+  username: "{{.App.Name}}"
+  password: "{{.App.Name}}"

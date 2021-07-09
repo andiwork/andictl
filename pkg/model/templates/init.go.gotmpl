@@ -1,6 +1,6 @@
-package user
+package {{ .Package }}
 
 func Migrate() (models []interface{}) {
-	models = append(models, new(User))
+	models = append(models, new({{ .Name | title }}))
 	return
 }

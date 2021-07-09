@@ -11,9 +11,10 @@ import (
 )
 
 type AndiModel struct {
-	Module  string
-	Name    string
-	Package string
+	Module     string
+	Name       string
+	Package    string
+	ApiVersion string
 }
 
 func GenerateModelSurvey() (answers AndiModel, err error) {
@@ -48,6 +49,13 @@ func GenerateModelSurvey() (answers AndiModel, err error) {
 				Options: pack,
 			},
 			Validate: survey.Required,
+		},
+		{
+			Name: "apiVersion",
+			Prompt: &survey.Input{
+				Message: "What is apiVersion?",
+				Default: "v1",
+			},
 		},
 	}
 	// the answers will be written to this struct

@@ -14,24 +14,25 @@ func Generate(model configs.AndiModel) {
 	//path, _ := os.Getwd()
 	//pack := path[strings.LastIndex(path, "/")+1:]
 	modelSlug := utils.AndictlSlugify(model.Name)
-	pack := model.Package
 	if model.Package == "new package" {
-		pack = modelSlug
+		model.Package = modelSlug
 	}
-	log.Println("Creating model: ", modelSlug, "in package :", pack)
+	log.Println("model: ", model)
+	log.Println("Creating model: ", modelSlug, "in package :", model.Package)
 
-	packPath := configs.AppDir + "pkg/" + pack
+	packPath := configs.AppDir + "pkg/" + model.Package
 	os.MkdirAll(packPath, os.ModePerm)
 
 	// Generate model files
 	data, _ := modelGoTmpl.ReadFile("templates/model.go.gotmpl")
-	utils.ProcessTmplFiles(packPath, modelSlug+"_model.go", data, model, false)
+	utils.ProcessTmplFiles(packPath, "model.go", data, model, false)
 
-	data, _ = modelGoTmpl.ReadFile("templates/model.go.gotmpl")
+	data, _ = modelResourceGoTmpl.ReadFile("templates/model_resource.go.gotmpl")
 	utils.ProcessTmplFiles(packPath, modelSlug+"_resource.go", data, model, false)
 
 	if _, err := os.Stat("init.go"); os.IsNotExist(err) {
 		data, _ = initGoTmpl.ReadFile("templates/init.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, "init.go", data, model, false)
 	}
+
 }
