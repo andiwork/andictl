@@ -25,18 +25,18 @@ func Generate() {
 	fmt.Println("create ", "pkg/middleware")
 
 	// initialiaze go module
-	os.Chdir(configs.AppDir)
+	//os.Chdir(configs.AppDir)
 	if _, err := os.Stat("go.mod"); os.IsNotExist(err) {
 		ExecShellCommand("go", []string{"mod", "init", configs.AppConfs.App.Name})
 	}
 	//defer ExecShellCommand("go", []string{"mod", "tidy"})
 	//Generate main.go
 	data, _ := mainGoTmpl.ReadFile("templates/main.go.gotmpl")
-	utils.ProcessTmplFiles(".", "main.go", data, configs.AppConfs, false)
+	utils.ProcessTmplFiles(configs.AppDir, "main.go", data, configs.AppConfs, false)
 
 	// Generate configs
 	// package files
-	genFolder := "configs"
+	genFolder := configs.AppDir + "configs"
 
 	data, _ = appTmpl.ReadFile("templates/app.yaml.gotmpl")
 	utils.ProcessTmplFiles(genFolder, "app.yaml", data, configs.AppConfs, false)
@@ -57,11 +57,11 @@ func Generate() {
 	utils.ProcessTmplFiles(genFolder, "swagger.go", data, configs.AppConfs, false)
 
 	data, _ = authzGoTmpl.ReadFile("templates/authz.go.gotmpl")
-	utils.ProcessTmplFiles("pkg/middleware", "authz.go", data, nil, false)
+	utils.ProcessTmplFiles(configs.AppDir+"pkg/middleware", "authz.go", data, nil, false)
 
 	if configs.AppConfs.App.AuthType == "jwt" {
 		data, _ = jwtGoTmpl.ReadFile("templates/jwt.go.gotmpl")
-		utils.ProcessTmplFiles("pkg/middleware", "jwt.go", data, nil, false)
+		utils.ProcessTmplFiles(configs.AppDir+"pkg/middleware", "jwt.go", data, nil, false)
 	}
 
 	// Download swagger ui files
