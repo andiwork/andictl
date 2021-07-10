@@ -2,8 +2,8 @@ package model
 
 import (
 	"fmt"
+	"log"
 	"os"
-	"strings"
 
 	"github.com/andiwork/andictl/configs"
 	"github.com/andiwork/andictl/utils"
@@ -15,7 +15,10 @@ type TemplateData struct {
 	Data  []map[interface{}]interface{}
 }
 
-var templateData TemplateData
+var (
+	templateData TemplateData
+	appModule    string
+)
 
 func Generate(model configs.AndiModel) {
 
@@ -23,7 +26,7 @@ func Generate(model configs.AndiModel) {
 	//path, _ := os.Getwd()
 	//pack := path[strings.LastIndex(path, "/")+1:]
 	modelSlug := utils.AndictlSlugify(model.Name)
-
+	appModule = model.Module
 	//fetch model in config file
 	exist, models := IsKeyInConfFile("models", "name", modelSlug)
 
@@ -42,8 +45,6 @@ func Generate(model configs.AndiModel) {
 		data, _ = modelResourceGoTmpl.ReadFile("templates/model_resource.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, modelSlug+"_resource.go", data, model, false)
 
-		fmt.Println("======= TODO ======")
-
 		// register  models in package init.go
 		initGo := packPath + "/init.go"
 		registerModels := make([]map[interface{}]interface{}, 0)
@@ -53,30 +54,26 @@ func Generate(model configs.AndiModel) {
 		if _, err := os.Stat(initGo); !os.IsNotExist(err) {
 			// collect existing models
 			registerModels, _ = IsKeyInConfFile("models", "package", model.Package)
-			fmt.Println(" existing model === ", registerModels)
 		}
-		// add new model to register
+		//==> add new model to register
 		registerModels = append(registerModels, newModel)
 		templateData.Data = registerModels
 		templateData.First = registerModels[0]
 		data, _ = initGoTmpl.ReadFile("templates/init.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, "init.go", data, templateData, false)
-		// import new package in gorm.go
-		gormFile := configs.AppDir + "configs/gorm.go"
-		importPackage := fmt.Sprintf("\"%s/pkg/%s\"", model.Module, model.Package)
-		fmt.Println("Import: ", importPackage, " before //andi-import-do-not-remove in file: ", gormFile)
+		//==> import new package in gorm.go
+		confDir := configs.AppDir + "configs"
+		packages := GetDistinctElementInConf("models", "package")
+		//add current package to the existing
+		packages[model.Package] = appModule
+		data, _ = gormMigrateTmpl.ReadFile("templates/gorm.go.gotmpl")
+		utils.ProcessTmplFiles(confDir, "gorm.go", data, packages, false)
 
-		// register migration new model in gorm.go
-		migrateModel := fmt.Sprintf("GormDb.AutoMigrate(%s.Migrate()...)", model.Package)
-		fmt.Println("Add: ", migrateModel, " before //andi-auto-migrate-do-not-remove in file: ", gormFile)
-		fmt.Println("==")
-		// import new package and create service in restful.go
-		restfulFile := configs.AppDir + "configs/restful.go"
-		fmt.Println("Import: ", importPackage, " before //andi-import-do-not-remove in file: ", restfulFile)
+		//=> import new package and create service in restful.go
+		data, _ = restfulWebserviceGoTmpl.ReadFile("templates/restful.go.gotmpl")
+		utils.ProcessTmplFiles(confDir, "restful.go", data, packages, false)
 
-		createService := fmt.Sprintf("restful.DefaultContainer.Add(%s.New(GormDb).WebService())", strings.ToLower(model.Name))
-		fmt.Println("Add: ", createService, " before //andi-add-restful-webservice in file: ", restfulFile)
-		fmt.Println("==")
+		fmt.Println("======= TODO ======")
 		fmt.Println("Execute: go mod tidy")
 		fmt.Println("===================")
 		//Update andictl.yaml with new model
@@ -100,20 +97,40 @@ func updateAndictlConfFile(modelName string, modelPackage string, models []inter
 	}
 }
 
+//IsKeyInConfFile search an element identified by searchKey=searchValue in config file
 func IsKeyInConfFile(getKey string, searchKey string, searchValue string) (exist []map[interface{}]interface{}, entries []interface{}) {
-	if err := viper.ReadInConfig(); err == nil {
-		fromFile := viper.Get(getKey)
-		if fromFile != nil {
-			entries = fromFile.([]interface{})
-			//fmt.Println("get model 0 ", models[0].(map[interface{}]interface{})["package"])
-			for _, v := range entries {
-				value := v.(map[interface{}]interface{})
-				if value[searchKey] == searchValue {
-					exist = append(exist, value)
-				}
+	fromFile := viper.Get(getKey)
+	if fromFile != nil {
+		entries = fromFile.([]interface{})
+		//fmt.Println("get model 0 ", models[0].(map[interface{}]interface{})["package"])
+		for _, v := range entries {
+			value := v.(map[interface{}]interface{})
+			if value[searchKey] == searchValue {
+				exist = append(exist, value)
 			}
 		}
-
 	}
+
+	return
+}
+
+//GetElementInConf get an element identified by searchKey in config file
+func GetDistinctElementInConf(getKey string, searchKey string) (exist map[string]string) {
+	fromFile := viper.Get(getKey)
+	exist = make(map[string]string)
+	if fromFile != nil {
+		entries := fromFile.([]interface{})
+		//fmt.Println("get model 0 ", models[0].(map[interface{}]interface{})["package"])
+		for _, v := range entries {
+			value := v.(map[interface{}]interface{})
+			log.Println(" ==== ", value)
+			//find the key in map from conf file
+			if element, ok := value[searchKey]; ok {
+				//add the value found into a map to avoid duplication
+				exist[element.(string)] = appModule
+			}
+		}
+	}
+
 	return
 }

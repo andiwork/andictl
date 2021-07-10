@@ -19,7 +19,7 @@ type GeneralConfig struct {
 	Models []Model     `mapstructure:"models"`
 }
 
-var AppDir = "test/"
+var AppDir = "./"
 
 var AppConfs GeneralConfig
 

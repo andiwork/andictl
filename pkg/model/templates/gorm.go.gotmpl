@@ -9,12 +9,19 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	{{- range $package, $module := . }}
+	"{{$module}}/pkg/{{$package}}"
+	{{ end -}}
 )
 
 var GormDb *gorm.DB
 var err error
 
-func migrateSchema() {}
+func migrateSchema() {
+	{{- range $package, $module := . }}
+	GormDb.AutoMigrate({{$package}}.Migrate()...)
+	{{ end -}}
+}
 
 func GormConfigs(app AppConfig) {
 

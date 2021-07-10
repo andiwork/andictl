@@ -21,7 +21,6 @@ import (
 
 	"github.com/andiwork/andictl/configs"
 	"github.com/andiwork/andictl/pkg/app"
-	"github.com/andiwork/andictl/pkg/model"
 	slugify "github.com/metal3d/go-slugify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -40,9 +39,6 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if andictlVersion {
 			fmt.Println("version: 1.0.0")
-			exist, _ := model.IsKeyInConfFile("models", "package", "angelo")
-			fmt.Println("exist:", len(exist), exist)
-
 		} else {
 
 			// If a config file is found, read it in.
@@ -98,7 +94,7 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	rootCmd.Flags().BoolVarP(&andictlVersion, "version", "v", true, "show andictl version")
+	rootCmd.Flags().BoolVarP(&andictlVersion, "version", "v", false, "show andictl version")
 }
 
 // initConfig reads in config file and ENV variables if set.

@@ -21,6 +21,7 @@ import (
 	"github.com/andiwork/andictl/configs"
 	"github.com/andiwork/andictl/pkg/model"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // modelCmd represents the model command
@@ -33,6 +34,10 @@ var modelCmd = &cobra.Command{
 andictl generate model --name hello --fields "name:string,age:int"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		if err := viper.ReadInConfig(); err != nil {
+			panic(err)
+		}
+
 		answers, err := configs.GenerateModelSurvey()
 		if err != nil {
 			fmt.Printf("Error ", err)

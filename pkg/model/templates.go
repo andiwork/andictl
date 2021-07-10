@@ -10,3 +10,9 @@ var modelGoTmpl embed.FS
 
 //go:embed templates/model_resource.go.gotmpl
 var modelResourceGoTmpl embed.FS
+
+//go:embed templates/gorm.go.gotmpl
+var gormMigrateTmpl embed.FS
+
+//go:embed templates/restful.go.gotmpl
+var restfulWebserviceGoTmpl embed.FS

@@ -36,25 +36,25 @@ func Generate() {
 
 	// Generate configs
 	// package files
-	genFolder := configs.AppDir + "configs"
+	confDir := configs.AppDir + "configs"
 
 	data, _ = appTmpl.ReadFile("templates/app.yaml.gotmpl")
-	utils.ProcessTmplFiles(genFolder, "app.yaml", data, configs.AppConfs, false)
+	utils.ProcessTmplFiles(confDir, "app.yaml", data, configs.AppConfs, false)
 
 	data, _ = prodTmpl.ReadFile("templates/prod.yaml.gotmpl")
-	utils.ProcessTmplFiles(genFolder, "prod.yaml", data, configs.AppConfs, false)
+	utils.ProcessTmplFiles(confDir, "prod.yaml", data, configs.AppConfs, false)
 
 	data, _ = appGoTmpl.ReadFile("templates/app.go.gotmpl")
-	utils.ProcessTmplFiles(genFolder, "app.go", data, configs.AppConfs, false)
+	utils.ProcessTmplFiles(confDir, "app.go", data, configs.AppConfs, false)
 
 	data, _ = gormGoTmpl.ReadFile("templates/gorm.go.gotmpl")
-	utils.ProcessTmplFiles(genFolder, "gorm.go", data, configs.AppConfs, false)
+	utils.ProcessTmplFiles(confDir, "gorm.go", data, configs.AppConfs, false)
 
 	data, _ = restfulGoTmpl.ReadFile("templates/restful.go.gotmpl")
-	utils.ProcessTmplFiles(genFolder, "restful.go", data, configs.AppConfs, false)
+	utils.ProcessTmplFiles(confDir, "restful.go", data, configs.AppConfs, false)
 
 	data, _ = swaggerGoTmpl.ReadFile("templates/swagger.go.gotmpl")
-	utils.ProcessTmplFiles(genFolder, "swagger.go", data, configs.AppConfs, false)
+	utils.ProcessTmplFiles(confDir, "swagger.go", data, configs.AppConfs, false)
 
 	data, _ = authzGoTmpl.ReadFile("templates/authz.go.gotmpl")
 	utils.ProcessTmplFiles(configs.AppDir+"pkg/middleware", "authz.go", data, nil, false)
