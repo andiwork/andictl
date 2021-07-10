@@ -27,6 +27,7 @@ import (
 )
 
 //var cfgFile string
+var andictlVersion bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -36,35 +37,41 @@ var rootCmd = &cobra.Command{
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		// If a config file is found, read it in.
-		if err := viper.ReadInConfig(); err != nil {
-			// perform the questions
-			os.Create(".andictl.yaml")
-			answers, err := configs.InitSurvey()
-			if err != nil {
-				fmt.Println(err.Error())
-			} else {
-				appName := slugify.Marshal(answers.Name)
-				viper.Set("application.name", appName)
-				viper.Set("application.type", answers.Type)
-				viper.Set("application.port", answers.Port)
-				viper.Set("application.database-type", answers.DatabaseType)
-				if answers.AuthType != "none" {
-					viper.Set("application.auth", true)
-					viper.Set("application.authType", answers.AuthType)
-				}
+		if andictlVersion {
+			fmt.Println("version: 1.0.0")
+		} else {
 
-				err := viper.WriteConfig()
+			// If a config file is found, read it in.
+			if err := viper.ReadInConfig(); err != nil {
+				// perform the questions
+				os.Create(".andictl.yaml")
+				answers, err := configs.InitSurvey()
 				if err != nil {
-					fmt.Println("Eror while writing config file:", err)
+					fmt.Println(err.Error())
+				} else {
+					appName := slugify.Marshal(answers.Name)
+					viper.Set("application.name", appName)
+					viper.Set("application.type", answers.Type)
+					viper.Set("application.port", answers.Port)
+					viper.Set("application.database-type", answers.DatabaseType)
+					if answers.AuthType != "none" {
+						viper.Set("application.auth", true)
+						viper.Set("application.authType", answers.AuthType)
+					}
+					viper.Set("models", "")
+
+					err := viper.WriteConfig()
+					if err != nil {
+						fmt.Println("Eror while writing config file:", err)
+					}
 				}
 			}
+			if err := viper.Unmarshal(&configs.AppConfs); err != nil {
+				fmt.Printf("couldn't read config: %s", err)
+			}
+			//Generate app skeleton
+			app.Generate()
 		}
-		if err := viper.Unmarshal(&configs.AppConfs); err != nil {
-			fmt.Printf("couldn't read config: %s", err)
-		}
-		//Generate app skeleton
-		app.Generate()
 
 	},
 }
@@ -86,7 +93,8 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().BoolVarP(&andictlVersion, "version", "v", true, "show andictl version")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -96,7 +104,7 @@ func initConfig() {
 	//cobra.CheckErr(err)
 
 	// Search config in home directory with name ".andictl" (without extension).
-	viper.AddConfigPath(".")
+	viper.AddConfigPath(configs.AppDir)
 	viper.SetConfigType("yaml")
 	viper.SetConfigName(".andictl")
 	viper.AutomaticEnv() // read in environment variables that match
