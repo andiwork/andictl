@@ -1,7 +1,7 @@
-package {{ .Package }}
-
+package {{ .First.package  }}
 func Migrate() (models []interface{}) {
-	models = append(models, new({{ .Name | title }}))
-	//andi-add-model-to-migrate
+{{- range .Data }}
+	models = append(models, new({{ .name | title }}))
+{{ end -}}
 	return
 }

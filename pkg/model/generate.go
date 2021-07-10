@@ -10,6 +10,13 @@ import (
 	"github.com/spf13/viper"
 )
 
+type TemplateData struct {
+	First map[interface{}]interface{}
+	Data  []map[interface{}]interface{}
+}
+
+var templateData TemplateData
+
 func Generate(model configs.AndiModel) {
 
 	// create package folder
@@ -20,7 +27,7 @@ func Generate(model configs.AndiModel) {
 	//fetch model in config file
 	exist, models := IsKeyInConfFile("models", "name", modelSlug)
 
-	if !exist {
+	if len(exist) == 0 {
 		if model.Package == "new package" {
 			model.Package = modelSlug
 		}
@@ -37,19 +44,23 @@ func Generate(model configs.AndiModel) {
 
 		fmt.Println("======= TODO ======")
 
+		// register  models in package init.go
 		initGo := packPath + "/init.go"
-		if _, err := os.Stat(initGo); os.IsNotExist(err) {
-			data, _ = initGoTmpl.ReadFile("templates/init.go.gotmpl")
-			utils.ProcessTmplFiles(packPath, "init.go", data, model, false)
-			//fmt.Println("create ", packPath+"/init.go")
-		} else {
-			// register new models
-			register := fmt.Sprintf("models = append(models, new(%s))", strings.Title(model.Name))
-			fmt.Println("Add: ", register, " before //andi-add-model-to-migrate in file: ", initGo)
-			fmt.Println("==")
-			//utils.InsertInfile(register, "//andi-generate-do-not-remove", initGo)
+		registerModels := make([]map[interface{}]interface{}, 0)
+		newModel := make(map[interface{}]interface{}, 1)
+		newModel["name"] = model.Name
+		newModel["package"] = model.Package
+		if _, err := os.Stat(initGo); !os.IsNotExist(err) {
+			// collect existing models
+			registerModels, _ = IsKeyInConfFile("models", "package", model.Package)
+			fmt.Println(" existing model === ", registerModels)
 		}
-
+		// add new model to register
+		registerModels = append(registerModels, newModel)
+		templateData.Data = registerModels
+		templateData.First = registerModels[0]
+		data, _ = initGoTmpl.ReadFile("templates/init.go.gotmpl")
+		utils.ProcessTmplFiles(packPath, "init.go", data, templateData, false)
 		// import new package in gorm.go
 		gormFile := configs.AppDir + "configs/gorm.go"
 		importPackage := fmt.Sprintf("\"%s/pkg/%s\"", model.Module, model.Package)
@@ -71,7 +82,8 @@ func Generate(model configs.AndiModel) {
 		//Update andictl.yaml with new model
 		updateAndictlConfFile(modelSlug, model.Package, models)
 	} else {
-		fmt.Println("model", modelSlug, "already exist")
+		conf := viper.ConfigFileUsed()
+		fmt.Println("model", modelSlug, "already exist. Take a look at the conf file:", conf)
 	}
 
 }
@@ -88,16 +100,16 @@ func updateAndictlConfFile(modelName string, modelPackage string, models []inter
 	}
 }
 
-func IsKeyInConfFile(getKey string, searchKey string, searchValue string) (exist bool, entries []interface{}) {
+func IsKeyInConfFile(getKey string, searchKey string, searchValue string) (exist []map[interface{}]interface{}, entries []interface{}) {
 	if err := viper.ReadInConfig(); err == nil {
 		fromFile := viper.Get(getKey)
 		if fromFile != nil {
 			entries = fromFile.([]interface{})
 			//fmt.Println("get model 0 ", models[0].(map[interface{}]interface{})["package"])
 			for _, v := range entries {
-				if v.(map[interface{}]interface{})[searchKey] == searchValue {
-					exist = true
-					break
+				value := v.(map[interface{}]interface{})
+				if value[searchKey] == searchValue {
+					exist = append(exist, value)
 				}
 			}
 		}

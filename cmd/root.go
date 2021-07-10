@@ -21,6 +21,7 @@ import (
 
 	"github.com/andiwork/andictl/configs"
 	"github.com/andiwork/andictl/pkg/app"
+	"github.com/andiwork/andictl/pkg/model"
 	slugify "github.com/metal3d/go-slugify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -39,6 +40,9 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if andictlVersion {
 			fmt.Println("version: 1.0.0")
+			exist, _ := model.IsKeyInConfFile("models", "package", "angelo")
+			fmt.Println("exist:", len(exist), exist)
+
 		} else {
 
 			// If a config file is found, read it in.
@@ -108,4 +112,22 @@ func initConfig() {
 	viper.SetConfigType("yaml")
 	viper.SetConfigName(".andictl")
 	viper.AutomaticEnv() // read in environment variables that match
+}
+
+func IsKeyInConfFile(getKey string, searchKey string, searchValue string) (exist bool, entries []interface{}) {
+	if err := viper.ReadInConfig(); err == nil {
+		fromFile := viper.Get(getKey)
+		if fromFile != nil {
+			entries = fromFile.([]interface{})
+			//fmt.Println("get model 0 ", models[0].(map[interface{}]interface{})["package"])
+			for _, v := range entries {
+				if v.(map[interface{}]interface{})[searchKey] == searchValue {
+					exist = true
+					break
+				}
+			}
+		}
+
+	}
+	return
 }
