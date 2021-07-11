@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"reflect"
 
@@ -31,6 +30,8 @@ func Generate(model configs.AndiModel) {
 	exist, models := IsKeyInConfFile("models", "name", modelSlug)
 
 	if len(exist) == 0 {
+		// set application AuthType
+		model.AuthType = viper.GetString("application.authtype")
 		if model.Package == "new package" {
 			model.Package = modelSlug
 		}
@@ -63,7 +64,6 @@ func Generate(model configs.AndiModel) {
 		//==> import new package in gorm.go
 		confDir := configs.AppDir + "configs"
 		packages := GetDistinctElementInConf("models", "package")
-		log.Println(" === okkkk === ")
 		//add current package to the existing
 		packages[model.Package] = appModule
 		data, _ = gormMigrateTmpl.ReadFile("templates/gorm.go.gotmpl")

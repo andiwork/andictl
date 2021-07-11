@@ -1,12 +1,12 @@
 package configs
 
 type Application struct {
-	Type         string // survey will match the question and field names
-	Name         string // or you can tag fields to match a specific name
-	Auth         bool
-	AuthType     string
-	Port         string
-	DatabaseType string `mapstructure:"database-type"`
+	Type         string // application type api, front
+	Name         string // application name
+	Auth         bool   // secure application api true|false
+	AuthType     string // auth type jwt|oidc
+	Port         string // application port
+	DatabaseType string `mapstructure:"database-type"` // application database-type
 }
 
 type Model struct {
@@ -19,7 +19,7 @@ type GeneralConfig struct {
 	Models []Model     `mapstructure:"models"`
 }
 
-var AppDir = "test/"
+var AppDir = "./"
 
 var AppConfs GeneralConfig
 

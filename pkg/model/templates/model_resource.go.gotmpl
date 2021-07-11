@@ -34,6 +34,12 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 	tags := []string{"{{ .Name | toLower }}s"}
 
 	ws.Route(ws.GET("/").To(u.findAll{{ .Name | title }}s).
+		//Authorization middleware. To be implemented
+		Filter(mid.AuthzMiddleware).
+		{{ if eq .AuthType "jwt" -}}
+		// Jwt auth middleware
+		Filter(mid.AuthJWT).
+		{{- end }}
 		// docs
 		Doc("get all {{ .Name | toLower }}s").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
@@ -45,8 +51,13 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 		Writes([]{{ .Name | title }}{}).
 		Returns(200, "OK", []{{ .Name | title }}{}))
 
-	ws.Route(ws.GET("/{id}").Filter(mid.AuthzMiddleware).
-		To(u.find{{ .Name | title }}).
+	ws.Route(ws.GET("/{id}").To(u.find{{ .Name | title }}).
+		//Authorization middleware. To be implemented
+		Filter(mid.AuthzMiddleware).
+		{{ if eq .AuthType "jwt" -}}
+		// Jwt auth middleware
+		Filter(mid.AuthJWT).
+		{{- end }}
 		// docs
 		Doc("get a {{ .Name | title }}").
 		Param(ws.PathParameter("id", "identifier of the {{ .Name | title }}").DataType("string")).
@@ -56,18 +67,36 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 		Returns(404, "Not Found", nil))
 
 	ws.Route(ws.PUT("/").To(u.update{{ .Name | title }}).
+		//Authorization middleware. To be implemented
+		Filter(mid.AuthzMiddleware).
+		{{ if eq .AuthType "jwt" -}}
+		// Jwt auth middleware
+		Filter(mid.AuthJWT).
+		{{- end }}
 		// docs
 		Doc("update a {{ .Name | title }}").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Reads({{ .Name | title }}{})) // from the request
 
 	ws.Route(ws.POST("").To(u.create{{ .Name | title }}).
+		//Authorization middleware. To be implemented
+		Filter(mid.AuthzMiddleware).
+		{{ if eq .AuthType "jwt" -}}
+		// Jwt auth middleware
+		Filter(mid.AuthJWT).
+		{{- end }}
 		// docs
 		Doc("create a {{ .Name | title }}").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Reads({{ .Name | title }}{})) // from the request
 
 	ws.Route(ws.DELETE("/{id}").To(u.remove{{ .Name | title }}).
+		//Authorization middleware. To be implemented
+		Filter(mid.AuthzMiddleware).
+		{{ if eq .AuthType "jwt" -}}
+		// Jwt auth middleware
+		Filter(mid.AuthJWT).
+		{{- end }}
 		// docs
 		Doc("delete a {{ .Name | title }}").
 		Metadata(restfulspec.KeyOpenAPITags, tags).

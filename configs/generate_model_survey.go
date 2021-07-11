@@ -16,6 +16,7 @@ type AndiModel struct {
 	Name       string
 	Package    string
 	ApiVersion string
+	AuthType   string
 }
 
 func GenerateModelSurvey() (answers AndiModel, err error) {
