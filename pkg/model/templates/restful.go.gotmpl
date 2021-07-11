@@ -4,7 +4,7 @@ import (
 	"net/http"
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	restful "github.com/emicklei/go-restful/v3"
-	{{- range $package, $module := . }}
+	{{- range $package, $module := .First }}
 	"{{$module}}/pkg/{{$package}}"
 	{{ end -}}
 )
@@ -12,8 +12,8 @@ import (
 var apiDocsPath = "/apidocs/"
 
 func InitWebservices() {
-	{{- range $package, $module := . }}
-	restful.DefaultContainer.Add({{$package}}.New(GormDb).WebService())
+	{{- range  .Data }}
+	restful.DefaultContainer.Add({{.package}}.New{{ .name | title }}Resource(GormDb).WebService())
 	{{ end -}}
 
 	// Get swagger configurations

@@ -24,11 +24,6 @@ func Generate() {
 	os.MkdirAll(configs.AppDir+"pkg/middleware", os.ModePerm)
 	fmt.Println("create ", "pkg/middleware")
 
-	// initialiaze go module
-	//os.Chdir(configs.AppDir)
-	if _, err := os.Stat("go.mod"); os.IsNotExist(err) {
-		ExecShellCommand("go", []string{"mod", "init", configs.AppConfs.App.Name})
-	}
 	//defer ExecShellCommand("go", []string{"mod", "tidy"})
 	//Generate main.go
 	data, _ := mainGoTmpl.ReadFile("templates/main.go.gotmpl")
@@ -65,19 +60,26 @@ func Generate() {
 	}
 
 	// Download swagger ui files
-	if _, err := os.Stat("docs/swagger-ui/dist"); os.IsNotExist(err) {
+	if _, err := os.Stat(configs.AppDir + "docs/swagger-ui/dist"); os.IsNotExist(err) {
 
 		swagger, err := utils.DownloadFile("v3.51.1.tar.gz", "https://github.com/swagger-api/swagger-ui/archive/refs/tags/v3.51.1.tar.gz")
 		if err == nil {
 			//untar
 			ExecShellCommand("tar -xzf "+swagger+" -C /tmp", []string{})
-			ExecShellCommand("mv /tmp/swagger-ui-3.51.1/dist docs/swagger-ui", []string{})
+			ExecShellCommand(fmt.Sprintf("mv /tmp/swagger-ui-3.51.1/dist %s/docs/swagger-ui", configs.AppDir), []string{})
 		} else {
-			panic(err)
+			fmt.Printf("Error ", err)
+			os.Exit(0)
 		}
+	}
+	// initialiaze go module
+	os.Chdir(configs.AppDir)
+	if _, err := os.Stat("go.mod"); os.IsNotExist(err) {
+		ExecShellCommand("go", []string{"mod", "init", configs.AppConfs.App.Name})
 	}
 	fmt.Println("======= TODO ======")
 	fmt.Println("Execute: go mod tidy")
+	fmt.Println("===================")
 }
 
 func ExecShellCommand(bin string, args []string) {
@@ -89,11 +91,13 @@ func ExecShellCommand(bin string, args []string) {
 
 	res, err := cmd.Execute()
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error ", err)
+		os.Exit(0)
 	}
 
 	if res.ExitCode != 0 {
-		panic("Non-zero exit code: " + res.Stderr)
+		fmt.Printf("Non-zero exit code: ", res.Stderr)
+		os.Exit(0)
 	}
 	//fmt.Printf("stdout: %s, stderr: %s, exit-code: %d\n", res.Stdout, res.Stderr, res.ExitCode)
 

@@ -3,6 +3,7 @@ package configs
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -69,12 +70,14 @@ func GenerateModelSurvey() (answers AndiModel, err error) {
 func GetAppModule() string {
 	file, err := os.Open(AppDir + "go.mod")
 	if err != nil {
-		panic("Generation can only be done at the root level of the application")
+		fmt.Println("Generation can only be done at the root level of the application.", err)
+		os.Exit(0)
 	}
 	r := bufio.NewReader(file)
 	line, _, err := r.ReadLine()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(0)
 	}
 	moduleName := bytes.TrimPrefix(line, []byte("module "))
 	return string(moduleName)

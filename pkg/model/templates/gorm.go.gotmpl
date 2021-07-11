@@ -20,7 +20,7 @@ var err error
 func migrateSchema() {
 	{{- range $package, $module := . }}
 	GormDb.AutoMigrate({{$package}}.Migrate()...)
-	{{ end -}}
+	{{ end }}
 }
 
 func GormConfigs(app AppConfig) {

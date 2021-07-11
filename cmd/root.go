@@ -44,10 +44,15 @@ var rootCmd = &cobra.Command{
 			// If a config file is found, read it in.
 			if err := viper.ReadInConfig(); err != nil {
 				// perform the questions
-				os.Create(".andictl.yaml")
+				_, err := os.Create(configs.AppDir + ".andictl.yaml")
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(0)
+				}
 				answers, err := configs.InitSurvey()
 				if err != nil {
-					fmt.Println(err.Error())
+					fmt.Println(err)
+					os.Exit(0)
 				} else {
 					appName := slugify.Marshal(answers.Name)
 					viper.Set("application.name", appName)

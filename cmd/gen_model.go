@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/andiwork/andictl/configs"
 	"github.com/andiwork/andictl/pkg/model"
@@ -35,7 +36,8 @@ andictl generate model --name hello --fields "name:string,age:int"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := viper.ReadInConfig(); err != nil {
-			panic(err)
+			fmt.Printf("Error ", err)
+			os.Exit(0)
 		}
 
 		answers, err := configs.GenerateModelSurvey()

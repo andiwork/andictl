@@ -19,7 +19,7 @@ type {{ .Name | title }}Resource struct {
 	db *gorm.DB
 }
 
-func New(con *gorm.DB) {{ .Name | title }}Resource {
+func New{{ .Name | title }}Resource(con *gorm.DB) {{ .Name | title }}Resource {
 	return {{ .Name | title }}Resource{db: con}
 }
 

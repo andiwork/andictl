@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 
 	"github.com/andiwork/andictl/configs"
 	"github.com/andiwork/andictl/utils"
@@ -16,8 +17,7 @@ type TemplateData struct {
 }
 
 var (
-	templateData TemplateData
-	appModule    string
+	appModule string
 )
 
 func Generate(model configs.AndiModel) {
@@ -46,32 +46,33 @@ func Generate(model configs.AndiModel) {
 		utils.ProcessTmplFiles(packPath, modelSlug+"_resource.go", data, model, false)
 
 		// register  models in package init.go
-		initGo := packPath + "/init.go"
-		registerModels := make([]map[interface{}]interface{}, 0)
+		registerModels := make([]map[interface{}]interface{}, 1)
+		allModels := make([]map[interface{}]interface{}, 1)
 		newModel := make(map[interface{}]interface{}, 1)
 		newModel["name"] = model.Name
 		newModel["package"] = model.Package
-		if _, err := os.Stat(initGo); !os.IsNotExist(err) {
-			// collect existing models
-			registerModels, _ = IsKeyInConfFile("models", "package", model.Package)
-		}
-		//==> add new model to register
+		// collect existing models
+		registerModels, allModels = IsKeyInConfFile("models", "package", model.Package)
 		registerModels = append(registerModels, newModel)
-		templateData.Data = registerModels
-		templateData.First = registerModels[0]
+		allModels = append(allModels, newModel)
+		//==> add new model to register
+		templateData := TemplateData{First: registerModels[0], Data: registerModels}
 		data, _ = initGoTmpl.ReadFile("templates/init.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, "init.go", data, templateData, false)
+
 		//==> import new package in gorm.go
 		confDir := configs.AppDir + "configs"
 		packages := GetDistinctElementInConf("models", "package")
+		log.Println(" === okkkk === ")
 		//add current package to the existing
 		packages[model.Package] = appModule
 		data, _ = gormMigrateTmpl.ReadFile("templates/gorm.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "gorm.go", data, packages, false)
 
 		//=> import new package and create service in restful.go
+		templateData = TemplateData{First: packages, Data: allModels}
 		data, _ = restfulWebserviceGoTmpl.ReadFile("templates/restful.go.gotmpl")
-		utils.ProcessTmplFiles(confDir, "restful.go", data, packages, false)
+		utils.ProcessTmplFiles(confDir, "restful.go", data, templateData, false)
 
 		fmt.Println("======= TODO ======")
 		fmt.Println("Execute: go mod tidy")
@@ -85,8 +86,8 @@ func Generate(model configs.AndiModel) {
 
 }
 
-func updateAndictlConfFile(modelName string, modelPackage string, models []interface{}) {
-	model := make(map[string]string, 1)
+func updateAndictlConfFile(modelName string, modelPackage string, models []map[interface{}]interface{}) {
+	model := make(map[interface{}]interface{}, 1)
 	model["name"] = modelName
 	model["package"] = modelPackage
 	models = append(models, model)
@@ -98,32 +99,33 @@ func updateAndictlConfFile(modelName string, modelPackage string, models []inter
 }
 
 //IsKeyInConfFile search an element identified by searchKey=searchValue in config file
-func IsKeyInConfFile(getKey string, searchKey string, searchValue string) (exist []map[interface{}]interface{}, entries []interface{}) {
+func IsKeyInConfFile(getKey string, searchKey string, searchValue string) (exist []map[interface{}]interface{}, entries []map[interface{}]interface{}) {
 	fromFile := viper.Get(getKey)
-	if fromFile != nil {
-		entries = fromFile.([]interface{})
+	if fromFile != nil && reflect.TypeOf(fromFile) != reflect.TypeOf("string") {
+		elements := fromFile.([]interface{})
 		//fmt.Println("get model 0 ", models[0].(map[interface{}]interface{})["package"])
-		for _, v := range entries {
+		for _, v := range elements {
 			value := v.(map[interface{}]interface{})
+			entries = append(entries, value)
 			if value[searchKey] == searchValue {
 				exist = append(exist, value)
 			}
 		}
 	}
+	//os.Exit(0)
 
 	return
 }
 
 //GetElementInConf get an element identified by searchKey in config file
-func GetDistinctElementInConf(getKey string, searchKey string) (exist map[string]string) {
+func GetDistinctElementInConf(getKey string, searchKey string) (exist map[interface{}]interface{}) {
 	fromFile := viper.Get(getKey)
-	exist = make(map[string]string)
-	if fromFile != nil {
+	exist = make(map[interface{}]interface{}, 1)
+	if fromFile != nil && reflect.TypeOf(fromFile) != reflect.TypeOf("string") {
 		entries := fromFile.([]interface{})
 		//fmt.Println("get model 0 ", models[0].(map[interface{}]interface{})["package"])
 		for _, v := range entries {
 			value := v.(map[interface{}]interface{})
-			log.Println(" ==== ", value)
 			//find the key in map from conf file
 			if element, ok := value[searchKey]; ok {
 				//add the value found into a map to avoid duplication
