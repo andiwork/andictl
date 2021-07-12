@@ -5,10 +5,14 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	mid "{{.Module}}/pkg/middleware"
+	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	restful "github.com/emicklei/go-restful/v3"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
+
+var repo {{ .Name | title }}Repository
 
 // {{ .Name | title }}Resource is the REST layer to the {{ .Name | title }} domain
 type {{ .Name | title }}Resource struct {
@@ -17,6 +21,89 @@ type {{ .Name | title }}Resource struct {
 
 func New{{ .Name | title }}Resource(con *gorm.DB) {{ .Name | title }}Resource {
 	return {{ .Name | title }}Resource{db: con}
+}
+
+// WebService creates a new service that can handle REST requests for {{ .Name | title }} resources.
+func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
+	repo = {{ .Name | title }}Repository{db: u.db}
+	ws := new(restful.WebService)
+	ws.
+		Path("/{{.ApiVersion}}/{{ .Name | toLower }}s").
+		Consumes(restful.MIME_JSON, restful.MIME_XML).
+		Produces(restful.MIME_JSON, restful.MIME_XML) // you can specify this per route as well
+
+	tags := []string{"{{ .Name | toLower }}s"}
+
+	ws.Route(ws.GET("/").To(u.findAll{{ .Name | title }}s).
+		//Authorization middleware. To be implemented
+		Filter(mid.AuthzMiddleware).
+		{{ if eq .AuthType "jwt" -}}
+		// Jwt auth middleware
+		Filter(mid.AuthJWT).
+		{{- end }}
+		// docs
+		Doc("get all {{ .Name | toLower }}s").
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Param(ws.QueryParameter("query", "Filter. e.g. col1:v1,col2:v2").DataType("string").Required(false)).
+		Param(ws.QueryParameter("query", "Filter. e.g. col1:v1,col2:v2").DataType("string").Required(false)).
+		Param(ws.QueryParameter("order", "Order. e.g. col1 desc,col2").DataType("string").Required(false)).
+		Param(ws.QueryParameter("offset", "Start position of result set. Must be an integer").DataType("string").Required(false)).
+		Param(ws.QueryParameter("limit", "Limit the size of result set. Must be an integer").DataType("string").Required(false)).
+		Writes([]{{ .Name | title }}{}).
+		Returns(200, "OK", []{{ .Name | title }}{}))
+
+	ws.Route(ws.GET("/{id}").To(u.find{{ .Name | title }}).
+		//Authorization middleware. To be implemented
+		Filter(mid.AuthzMiddleware).
+		{{ if eq .AuthType "jwt" -}}
+		// Jwt auth middleware
+		Filter(mid.AuthJWT).
+		{{- end }}
+		// docs
+		Doc("get a {{ .Name | title }}").
+		Param(ws.PathParameter("id", "identifier of the {{ .Name | title }}").DataType("string")).
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Writes({{ .Name | title }}{}). // on the response
+		Returns(200, "OK", {{ .Name | title }}{}).
+		Returns(404, "Not Found", nil))
+
+	ws.Route(ws.PUT("/").To(u.update{{ .Name | title }}).
+		//Authorization middleware. To be implemented
+		Filter(mid.AuthzMiddleware).
+		{{ if eq .AuthType "jwt" -}}
+		// Jwt auth middleware
+		Filter(mid.AuthJWT).
+		{{- end }}
+		// docs
+		Doc("update a {{ .Name | title }}").
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Reads({{ .Name | title }}{})) // from the request
+
+	ws.Route(ws.POST("").To(u.create{{ .Name | title }}).
+		//Authorization middleware. To be implemented
+		Filter(mid.AuthzMiddleware).
+		{{ if eq .AuthType "jwt" -}}
+		// Jwt auth middleware
+		Filter(mid.AuthJWT).
+		{{- end }}
+		// docs
+		Doc("create a {{ .Name | title }}").
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Reads({{ .Name | title }}{})) // from the request
+
+	ws.Route(ws.DELETE("/{id}").To(u.remove{{ .Name | title }}).
+		//Authorization middleware. To be implemented
+		Filter(mid.AuthzMiddleware).
+		{{ if eq .AuthType "jwt" -}}
+		// Jwt auth middleware
+		Filter(mid.AuthJWT).
+		{{- end }}
+		// docs
+		Doc("delete a {{ .Name | title }}").
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Param(ws.PathParameter("id", "identifier of the {{ .Name | title }}").DataType("string")))
+
+	return ws
 }
 
 // GET http://localhost:8080/{{ .Name | toLower }}s
@@ -41,7 +128,7 @@ func (u {{ .Name | title }}Resource) findAll{{ .Name | title }}s(request *restfu
 	if order == "" {
 		order = "created_at desc"
 	}
-	list, err := GetAll{{ .Name | title }}(query, order, offset, limit, u.db)
+	list, err := GetAll{{ .Name | title }}Service(query, order, offset, limit, repo)
 	if err != nil {
 		response.WriteError(http.StatusInternalServerError, err)
 	}
@@ -52,7 +139,7 @@ func (u {{ .Name | title }}Resource) findAll{{ .Name | title }}s(request *restfu
 //
 func (u {{ .Name | title }}Resource) find{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	uuid, _ := uuid.Parse(request.PathParameter("id"))
-	{{ .Name | title }}, err := Get{{ .Name | title }}ById(uuid, u.db)
+	{{ .Name | title }}, err := Get{{ .Name | title }}ByIdService(uuid, repo)
 
 	if err == gorm.ErrRecordNotFound {
 		response.WriteErrorString(http.StatusNotFound, "{{ .Name | title }} could not be found.")
@@ -66,7 +153,7 @@ func (u {{ .Name | title }}Resource) find{{ .Name | title }}(request *restful.Re
 func (u *{{ .Name | title }}Resource) update{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	var {{ .Name | title }} {{ .Name | title }}
 	err := request.ReadEntity(&{{ .Name | title }})
-	err = Update{{ .Name | title }}ById(&{{ .Name | title }}, u.db)
+	err = Update{{ .Name | title }}ByIdService(&{{ .Name | title }}, repo)
 	if err == nil {
 		response.WriteEntity({{ .Name | title }})
 	} else {
@@ -79,7 +166,7 @@ func (u *{{ .Name | title }}Resource) update{{ .Name | title }}(request *restful
 func (u *{{ .Name | title }}Resource) create{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	{{ .Name | toLower }} := {{ .Name | title }}{}
 	err := request.ReadEntity(&{{ .Name | toLower }})
-	Add{{ .Name | title }}(&{{ .Name | toLower }}, u.db)
+	Add{{ .Name | title }}Service(&{{ .Name | toLower }}, repo)
 	if err == nil {
 		response.WriteHeaderAndEntity(http.StatusCreated, {{ .Name | toLower }})
 	} else {
@@ -91,7 +178,7 @@ func (u *{{ .Name | title }}Resource) create{{ .Name | title }}(request *restful
 //
 func (u *{{ .Name | title }}Resource) remove{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	uuid, _ := uuid.Parse(request.PathParameter("id"))
-	err := Delete{{ .Name | title }}(uuid, u.db)
+	err := Delete{{ .Name | title }}Service(uuid, repo)
 	if err == nil {
 		response.WriteHeader(http.StatusCreated)
 	} else {

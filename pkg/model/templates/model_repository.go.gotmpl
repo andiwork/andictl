@@ -1,0 +1,61 @@
+package {{.Package}}
+
+import (
+	"log"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+// Repository represent the repositories
+type Gorm{{ .Name | title }}Repository interface {
+	Add{{ .Name | title }}(m *{{ .Name | title }}, db *gorm.DB) (err error)
+	Get{{ .Name | title }}ById(id uuid.UUID, db *gorm.DB) (model {{ .Name | title }}, err error)
+	GetAll{{ .Name | title }}(query map[string]string, order string,
+		offset int, limit int, db *gorm.DB) (models []{{ .Name | title }}, err error)
+	Update{{ .Name | title }}ById(model *{{ .Name | title }}, db *gorm.DB) (err error)
+	Delete{{ .Name | title }}(id uuid.UUID, db *gorm.DB)
+}
+
+type {{ .Name | title }}Repository struct {
+	db *gorm.DB
+}
+
+// Add{{ .Name | title }} insert a new {{ .Name | title }} into database and returns
+// last inserted Id on success.
+func (r *{{ .Name | title }}Repository) Add{{ .Name | title }}(m *{{ .Name | title }}) (err error) {
+	err = r.db.Create(m).Error
+	return
+}
+
+// Get{{ .Name | title }}ById retrieves {{ .Name | title }} by Id. Returns error if
+// Id doesn't exist
+func (r *{{ .Name | title }}Repository) Get{{ .Name | title }}ById(id uuid.UUID) (model {{ .Name | title }}, err error) {
+	err = r.db.First(&model, "id = ?", id).Error
+	return
+}
+
+// GetAll{{ .Name | title }} retrieves all {{ .Name | title }} matches certain condition. Returns empty list if
+// no records exist
+func (r *{{ .Name | title }}Repository) GetAll{{ .Name | title }}(query map[string]string, order string,
+	offset int, limit int) (models []{{ .Name | title }}, err error) {
+	log.Println("query :", query, " order:", order, " limit:", limit, "offset:", offset)
+	err = r.db.Where(query).Order(order).
+		Limit(limit).Offset(offset).
+		Find(&models).Error
+	return
+}
+
+// Update{{ .Name | title }} updates {{ .Name | title }} by Id and returns error if
+// the record to be updated doesn't exist
+func (r *{{ .Name | title }}Repository) Update{{ .Name | title }}ById(model *{{ .Name | title }}) (err error) {
+	err = r.db.Save(model).Error
+	return
+}
+
+// Delete{{ .Name | title }} deletes {{ .Name | title }} by Id and returns error if
+// the record to be deleted doesn't exist
+func (r *{{ .Name | title }}Repository) Delete{{ .Name | title }}(id uuid.UUID) (err error) {
+	err = r.db.Delete(new({{ .Name | title }}), id).Error
+	return
+}

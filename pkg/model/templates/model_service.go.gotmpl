@@ -1,0 +1,26 @@
+package {{ .Package }}
+
+import (
+	"github.com/google/uuid"
+)
+
+func Add{{ .Name | title }}Service(m *{{ .Name | title }}, repo {{ .Name | title }}Repository) (err error) {
+	return repo.Add{{ .Name | title }}(m)
+}
+
+func Get{{ .Name | title }}ByIdService(id uuid.UUID, repo {{ .Name | title }}Repository) (model {{ .Name | title }}, err error) {
+	return repo.Get{{ .Name | title }}ById(id)
+}
+
+func GetAll{{ .Name | title }}Service(query map[string]string, order string,
+	offset int, limit int, repo {{ .Name | title }}Repository) (models []{{ .Name | title }}, err error) {
+	return repo.GetAll{{ .Name | title }}(query, order, offset, limit)
+}
+
+func Update{{ .Name | title }}ByIdService(m *{{ .Name | title }}, repo {{ .Name | title }}Repository) (err error) {
+	return repo.Update{{ .Name | title }}ById(m)
+}
+
+func Delete{{ .Name | title }}Service(id uuid.UUID, repo {{ .Name | title }}Repository) (err error) {
+	return repo.Delete{{ .Name | title }}(id)
+}

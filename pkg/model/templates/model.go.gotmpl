@@ -1,51 +1,8 @@
 package {{.Package}}
 
 import (
-	"log"
-
 	utils "github.com/andiwork/gorm-utils"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 type {{ .Name | title }} struct {
 	utils.Model
-}
-
-// Add{{ .Name | title }} insert a new {{ .Name | title }} into database and returns
-// last inserted Id on success.
-func Add{{ .Name | title }}(m *{{ .Name | title }}, db *gorm.DB) (err error) {
-	err = db.Create(m).Error
-	return
-}
-
-// Get{{ .Name | title }}ById retrieves {{ .Name | title }} by Id. Returns error if
-// Id doesn't exist
-func Get{{ .Name | title }}ById(id uuid.UUID, db *gorm.DB) (model {{ .Name | title }}, err error) {
-	err = db.First(&model, "id = ?", id).Error
-	return
-}
-
-// GetAll{{ .Name | title }} retrieves all {{ .Name | title }} matches certain condition. Returns empty list if
-// no records exist
-func GetAll{{ .Name | title }}(query map[string]string, order string,
-	offset int, limit int, db *gorm.DB) (models []{{ .Name | title }}, err error) {
-	log.Println("query :", query, " order:", order, " limit:", limit, "offset:", offset)
-	err = db.Where(query).Order(order).
-		Limit(limit).Offset(offset).
-		Find(&models).Error
-	return
-}
-
-// Update{{ .Name | title }} updates {{ .Name | title }} by Id and returns error if
-// the record to be updated doesn't exist
-func Update{{ .Name | title }}ById(model *{{ .Name | title }}, db *gorm.DB) (err error) {
-	err = db.Save(model).Error
-	return
-}
-
-// Delete{{ .Name | title }} deletes {{ .Name | title }} by Id and returns error if
-// the record to be deleted doesn't exist
-func Delete{{ .Name | title }}(id uuid.UUID, db *gorm.DB) (err error) {
-	err = db.Delete(new({{ .Name | title }}), id).Error
-	return
 }
