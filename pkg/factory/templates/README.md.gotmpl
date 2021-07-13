@@ -1,0 +1,7 @@
+#Usage
+```
+h, _ := {{ .Package }}.Call{{ .Name | title }}Factory("hello")
+log.Println("===== {{ .Name }} ", h.SayHello())
+w, _ := {{ .Package }}.Call{{ .Name | title }}Factory("world")
+log.Println("===== {{ .Name }} ", w.SayHello())
+```

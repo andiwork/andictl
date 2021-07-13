@@ -1,0 +1,13 @@
+package {{ .Package}}
+
+type HelloImplement struct{}
+
+func init() {
+	var hello HelloImplement
+	Register("hello", hello)
+
+}
+
+func (f HelloImplement) SayHello() (result string) {
+	return "Hello"
+}

@@ -1,0 +1,26 @@
+package {{ .Package}}
+
+import "log"
+
+type {{ .Name | title }}Factory interface {
+	SayHello() (result string)
+}
+
+var {{ .Name }}s = make(map[string]{{ .Name | title }}Factory)
+
+// Register is called to register a {{ .Name }}Factory.
+func Register(factType string, {{ .Name }} {{ .Name | title }}Factory) {
+	if _, exists := {{ .Name }}s[factType]; exists {
+		log.Println(factType, "{{ .Name | title }}Factory already registered")
+	}
+
+	log.Println("Register", factType, "{{ .Name }}")
+	{{ .Name }}s[factType] = {{ .Name }}
+}
+
+func Call{{ .Name | title }}Factory(factType string) ({{ .Name }} {{ .Name | title }}Factory, exists bool) {
+	if {{ .Name }}, exists = {{ .Name }}s[factType]; !exists {
+		log.Println(factType, "{{ .Name | title }}Factory not registered")
+	}
+	return
+}

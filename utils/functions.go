@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -51,4 +53,36 @@ func InsertInfile(str string, placeHolder string, file string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
+}
+
+func PackageList(path string) (pack []string) {
+	pack = []string{"new package"}
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		name := file.Name()
+		if file.IsDir() && name != "middleware" {
+			pack = append(pack, file.Name())
+		}
+	}
+	return
+}
+
+func GetAppModule(goModPath string) string {
+	file, err := os.Open(goModPath)
+	if err != nil {
+		fmt.Println("Generation can only be done at the root level of the application.", err)
+		os.Exit(0)
+	}
+	r := bufio.NewReader(file)
+	line, _, err := r.ReadLine()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	moduleName := bytes.TrimPrefix(line, []byte("module "))
+	return string(moduleName)
 }

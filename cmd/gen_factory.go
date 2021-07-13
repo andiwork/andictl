@@ -20,19 +20,18 @@ import (
 	"os"
 
 	"github.com/andiwork/andictl/configs"
-	"github.com/andiwork/andictl/pkg/model"
+	"github.com/andiwork/andictl/pkg/factory"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// modelCmd represents the model command
-var modelCmd = &cobra.Command{
-	Use:   "model",
-	Short: "generate model in package pkg/<model_name> ",
-	Long: `generate model in package pkg/<model_name>. 
+// factoryCmd represents the factory command
+var factoryCmd = &cobra.Command{
+	Use:   "factory",
+	Short: "generate factory in package pkg/<factory_name>",
+	Long: `generate factory in package pkg/<factory_name>
 	Example:
-
-	andictl generate model
+	andictl generate factory
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := viper.ReadInConfig(); err != nil {
@@ -40,25 +39,24 @@ var modelCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
-		answers, err := configs.GenerateModelSurvey()
+		answers, err := configs.GenerateFactorySurvey()
 		if err != nil {
 			fmt.Printf("Error ", err)
 		}
-		//	answers.Name = slugify.Marshal(answers.Name)
-		model.Generate(answers)
+		factory.Generate(answers)
 	},
 }
 
 func init() {
-	generateCmd.AddCommand(modelCmd)
+	generateCmd.AddCommand(factoryCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// modelCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// factoryCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// modelCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// factoryCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

@@ -1,0 +1,13 @@
+package {{ .Package}}
+
+type WorldImplement struct{}
+
+func init() {
+	var world WorldImplement
+	Register("world", world)
+
+}
+
+func (d WorldImplement) SayHello() (result string) {
+	return "world"
+}
