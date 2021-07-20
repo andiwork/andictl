@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	execute "github.com/alexellis/go-execute/pkg/v1"
 )
 
 func DownloadFile(filename string, url string) (filepath string, err error) {
@@ -85,4 +87,25 @@ func GetAppModule(goModPath string) string {
 	}
 	moduleName := bytes.TrimPrefix(line, []byte("module "))
 	return string(moduleName)
+}
+
+func ExecShellCommand(bin string, args []string, stream bool) {
+	cmd := execute.ExecTask{
+		Command:     bin,
+		Args:        args,
+		StreamStdio: stream,
+	}
+
+	res, err := cmd.Execute()
+	if err != nil {
+		fmt.Printf("Error ", err)
+		os.Exit(0)
+	}
+
+	if res.ExitCode != 0 {
+		fmt.Printf("Non-zero exit code: ", res.Stderr)
+		os.Exit(0)
+	}
+	//fmt.Printf("stdout: %s, stderr: %s, exit-code: %d\n", res.Stdout, res.Stderr, res.ExitCode)
+
 }

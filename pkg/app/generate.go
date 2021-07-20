@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	execute "github.com/alexellis/go-execute/pkg/v1"
 	"github.com/andiwork/andictl/configs"
 	"github.com/andiwork/andictl/utils"
 )
@@ -65,8 +64,8 @@ func Generate() {
 		swagger, err := utils.DownloadFile("v3.51.1.tar.gz", "https://github.com/swagger-api/swagger-ui/archive/refs/tags/v3.51.1.tar.gz")
 		if err == nil {
 			//untar
-			ExecShellCommand("tar -xzf "+swagger+" -C /tmp", []string{})
-			ExecShellCommand(fmt.Sprintf("mv /tmp/swagger-ui-3.51.1/dist %s/docs/swagger-ui", configs.AppDir), []string{})
+			utils.ExecShellCommand("tar -xzf "+swagger+" -C /tmp", []string{}, false)
+			utils.ExecShellCommand(fmt.Sprintf("mv /tmp/swagger-ui-3.51.1/dist %s/docs/swagger-ui", configs.AppDir), []string{}, false)
 		} else {
 			fmt.Printf("Error ", err)
 			os.Exit(0)
@@ -75,30 +74,9 @@ func Generate() {
 	// initialiaze go module
 	os.Chdir(configs.AppDir)
 	if _, err := os.Stat("go.mod"); os.IsNotExist(err) {
-		ExecShellCommand("go", []string{"mod", "init", configs.AppConfs.App.Name})
+		utils.ExecShellCommand("go", []string{"mod", "init", configs.AppConfs.App.Name}, false)
 	}
 	fmt.Println("======= TODO ======")
 	fmt.Println("Execute: go mod tidy")
 	fmt.Println("===================")
-}
-
-func ExecShellCommand(bin string, args []string) {
-	cmd := execute.ExecTask{
-		Command:     bin,
-		Args:        args,
-		StreamStdio: false,
-	}
-
-	res, err := cmd.Execute()
-	if err != nil {
-		fmt.Printf("Error ", err)
-		os.Exit(0)
-	}
-
-	if res.ExitCode != 0 {
-		fmt.Printf("Non-zero exit code: ", res.Stderr)
-		os.Exit(0)
-	}
-	//fmt.Printf("stdout: %s, stderr: %s, exit-code: %d\n", res.Stdout, res.Stderr, res.ExitCode)
-
 }
