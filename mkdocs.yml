@@ -1,0 +1,26 @@
+site_name: Andi Generator
+repo_url: https://github.com/andiwork/andictl
+repo_name: andiwork/andictl
+site_author: James Kokou GAGLO
+edit_uri: ""
+extra:
+  version:
+    provider: mike
+plugins:
+  - git-revision-date
+  - search
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+nav:
+  - Home: 'index.md'
+  - 'Getting started':
+      - Installation : 'getting-started-installation.md'
+      - 'Generate api': 'getting-started-generate-api.md'
+  - 'Desing & Architecture':
+      - Stack: 'archi-stack.md'
+  - About:
+      - 'License': 'apache-license-2.0.md'
+      - 'Release Notes': 'release-notes.md'
+copyright: Copyright &copy; 2021 - time.Now James Kokou GAGLO
