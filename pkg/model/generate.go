@@ -82,10 +82,10 @@ func Generate(model configs.AndiModel) {
 
 		defer utils.ExecShellCommand("go", []string{"mod", "tidy"}, false)
 		//Update andictl.yaml with new model
-		updateAndictlConfFile(modelSlug, model.Package, models)
+		updateAndictlConfFile(model.Name, model.Package, models)
 	} else {
 		conf := viper.ConfigFileUsed()
-		fmt.Println("model", modelSlug, "already exist. Take a look at the conf file:", conf)
+		fmt.Println("model", model.Name, "already exist. Take a look at the conf file:", conf)
 	}
 
 }

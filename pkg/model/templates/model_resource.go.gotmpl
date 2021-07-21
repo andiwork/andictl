@@ -29,11 +29,11 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 	repo = {{ .Name | title }}Repository{db: u.db}
 	ws := new(restful.WebService)
 	ws.
-		Path("/{{.ApiVersion}}/{{ .Name | toLower }}s").
+		Path("/{{.ApiVersion}}/{{ .Name | toLower }}").
 		Consumes(restful.MIME_JSON, restful.MIME_XML).
 		Produces(restful.MIME_JSON, restful.MIME_XML) // you can specify this per route as well
 
-	tags := []string{"{{ .Name | toLower }}s"}
+	tags := []string{"{{ .Name}}"}
 
 	ws.Route(ws.GET("/all").To(u.findAll{{ .Name | title }}s).
 		//Authorization middleware. To be implemented
