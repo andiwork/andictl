@@ -28,6 +28,9 @@ func Generate() {
 	data, _ := mainGoTmpl.ReadFile("templates/main.go.gotmpl")
 	utils.ProcessTmplFiles(configs.AppDir, "main.go", data, configs.AppConfs, false)
 
+	data, _ = gitignoreTmpl.ReadFile("templates/gitignore.gotmpl")
+	utils.ProcessTmplFiles(configs.AppDir, ".gitignore", data, configs.AppConfs, false)
+
 	// Generate configs
 	// package files
 	confDir := configs.AppDir + "configs"
@@ -54,8 +57,11 @@ func Generate() {
 	utils.ProcessTmplFiles(configs.AppDir+"pkg/middleware", "authz.go", data, nil, false)
 
 	if configs.AppConfs.App.AuthType == "jwt" {
+		os.MkdirAll(configs.AppDir+"utils", os.ModePerm)
 		data, _ = jwtGoTmpl.ReadFile("templates/jwt.go.gotmpl")
 		utils.ProcessTmplFiles(configs.AppDir+"pkg/middleware", "jwt.go", data, nil, false)
+		data, _ = swaggerHelperGoTmpl.ReadFile("templates/swagger_helper.go.gotmpl")
+		utils.ProcessTmplFiles(configs.AppDir+"utils", "swagger_helper.go", data, nil, false)
 	}
 
 	// Download swagger ui files
@@ -76,7 +82,5 @@ func Generate() {
 	if _, err := os.Stat("go.mod"); os.IsNotExist(err) {
 		utils.ExecShellCommand("go", []string{"mod", "init", configs.AppConfs.App.Name}, false)
 	}
-	fmt.Println("======= TODO ======")
-	fmt.Println("Execute: go mod tidy")
-	fmt.Println("===================")
+	defer utils.ExecShellCommand("go", []string{"mod", "tidy"}, false)
 }

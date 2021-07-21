@@ -11,6 +11,11 @@
 - Viper
 - Mockgen
 - Air
+- GoReleaser
+
+## Todos
+- Generate model with more fields
+- Generate service unit tests
 
 ## License
 

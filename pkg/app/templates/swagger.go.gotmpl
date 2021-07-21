@@ -2,7 +2,11 @@ package configs
 
 import (
 	"net/http"
-
+	{{ if eq .App.AuthType "jwt"}}
+	"{{.App.Name | andictlSlugify}}/utils"
+	"log"
+	"strings"
+	{{ end }}
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	restful "github.com/emicklei/go-restful/v3"
 	"github.com/go-openapi/spec"
@@ -30,26 +34,104 @@ func enrichSwaggerObject(swo *spec.Swagger) {
 			Description: "Resource for api",
 			Contact: &spec.ContactInfo{
 				ContactInfoProps: spec.ContactInfoProps{
-					Name:  "john",
-					Email: "john@doe.rp",
-					URL:   "http://johndoe.org",
+					Name:  "Andictl",
+					Email: "andictl@andi.dev",
+					URL:   "https://andiwork.github.io",
 				},
 				VendorExtensible: spec.VendorExtensible{},
 			},
 			License: &spec.License{
 				LicenseProps: spec.LicenseProps{
-					Name: "MIT",
-					URL:  "http://mit.org",
+					Name: "Apache License Version 2.0",
+					URL:  "https://www.apache.org/licenses/LICENSE-2.0.txt",
 				},
 			},
 			Version: "1.0.0",
 		},
 	}
-//	swo.Tags = []spec.Tag{spec.Tag{TagProps: spec.TagProps{
-//		Name:        "users",
-//		Description: "Managing users"}}}
+	//	swo.Tags = []spec.Tag{spec.Tag{TagProps: spec.TagProps{
+	//		Name:        "resources",
+	//		Description: "Managing resource"}}}
+{{ if eq .App.AuthType "jwt"}}
+	// setup security definitions
+	swo.SecurityDefinitions = map[string]*spec.SecurityScheme{
+		"jwt": spec.APIKeyAuth("Authorization", "header"),
+	}
+
+	// map routes to security definitions
+	enrichSwaggeerObjectSecurity(swo)
+{{ end }}
 }
 
+{{ if eq .App.AuthType "jwt" }}
+func enrichSwaggeerObjectSecurity(swo *spec.Swagger) {
+
+	// loop through all registerd web services
+	for _, ws := range restful.RegisteredWebServices() {
+		for _, route := range ws.Routes() {
+
+			// grab route metadata for a SecurityDefinition
+			secdefn, ok := route.Metadata[utils.SecurityDefinitionKey]
+			if !ok {
+				continue
+			}
+
+			// grab pechelper.OAISecurity from the stored interface{}
+			var sEntry utils.OAISecurity
+			switch v := secdefn.(type) {
+			case *utils.OAISecurity:
+				sEntry = *v
+			case utils.OAISecurity:
+				sEntry = v
+			default:
+				// not valid type
+				log.Printf("skipping Security openapi spec for %s:%s, invalid metadata type %v", route.Method, route.Path, v)
+				continue
+			}
+
+			if _, ok := swo.SecurityDefinitions[sEntry.Name]; !ok {
+				log.Printf("skipping Security openapi spec for %s:%s, '%s' not found in SecurityDefinitions", route.Method, route.Path, sEntry.Name)
+				continue
+			}
+
+			// grab path and path item in openapi spec
+			path, err := swo.Paths.JSONLookup(route.Path)
+			if err != nil {
+				log.Printf("skipping Security openapi spec for %s:%s, %s", route.Method, route.Path, err.Error())
+				continue
+			}
+			pItem := path.(*spec.PathItem)
+
+			// Update respective path Option based on method
+			var pOption *spec.Operation
+			switch method := strings.ToLower(route.Method); method {
+			case "get":
+				pOption = pItem.Get
+			case "post":
+				pOption = pItem.Post
+			case "patch":
+				pOption = pItem.Patch
+			case "delete":
+				pOption = pItem.Delete
+			case "put":
+				pOption = pItem.Put
+			case "head":
+				pOption = pItem.Head
+			case "options":
+				pOption = pItem.Options
+			default:
+				// unsupported method
+				log.Printf("skipping Security openapi spec for %s:%s, unsupported method '%s'", route.Method, route.Path, route.Method)
+				continue
+			}
+
+			// update the pOption with security entry
+			pOption.SecuredWith(sEntry.Name, sEntry.Scopes...)
+		}
+	}
+
+}
+{{ end }}
 func swaggerHandler(w http.ResponseWriter, req *http.Request) {
 	// remove/add not default ports from req.Host == req.URL.Path
 	openapi := "http://" + req.Host

@@ -80,9 +80,7 @@ func Generate(model configs.AndiModel) {
 		data, _ = restfulWebserviceGoTmpl.ReadFile("templates/restful.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "restful.go", data, templateData, false)
 
-		fmt.Println("======= TODO ======")
-		fmt.Println("Execute: go mod tidy")
-		fmt.Println("===================")
+		defer utils.ExecShellCommand("go", []string{"mod", "tidy"}, false)
 		//Update andictl.yaml with new model
 		updateAndictlConfFile(modelSlug, model.Package, models)
 	} else {

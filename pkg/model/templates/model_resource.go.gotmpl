@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	mid "{{.Module}}/pkg/middleware"
+	"{{.Module}}/utils"
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	restful "github.com/emicklei/go-restful/v3"
 	"github.com/google/uuid"
@@ -34,10 +35,12 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 
 	tags := []string{"{{ .Name | toLower }}s"}
 
-	ws.Route(ws.GET("/").To(u.findAll{{ .Name | title }}s).
+	ws.Route(ws.GET("/all").To(u.findAll{{ .Name | title }}s).
 		//Authorization middleware. To be implemented
 		Filter(mid.AuthzMiddleware).
 		{{ if eq .AuthType "jwt" -}}
+		//Enable security
+		Metadata(utils.SecurityDefinitionKey, utils.OAISecurity{Name: "jwt"}).
 		// Jwt auth middleware
 		Filter(mid.AuthJWT).
 		{{- end }}
@@ -56,6 +59,8 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 		//Authorization middleware. To be implemented
 		Filter(mid.AuthzMiddleware).
 		{{ if eq .AuthType "jwt" -}}
+		//Enable security
+		Metadata(utils.SecurityDefinitionKey, utils.OAISecurity{Name: "jwt"}).
 		// Jwt auth middleware
 		Filter(mid.AuthJWT).
 		{{- end }}
@@ -67,10 +72,12 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 		Returns(200, "OK", {{ .Name | title }}{}).
 		Returns(404, "Not Found", nil))
 
-	ws.Route(ws.PUT("/").To(u.update{{ .Name | title }}).
+	ws.Route(ws.PUT("/update").To(u.update{{ .Name | title }}).
 		//Authorization middleware. To be implemented
 		Filter(mid.AuthzMiddleware).
 		{{ if eq .AuthType "jwt" -}}
+		//Enable security
+		Metadata(utils.SecurityDefinitionKey, utils.OAISecurity{Name: "jwt"}).
 		// Jwt auth middleware
 		Filter(mid.AuthJWT).
 		{{- end }}
@@ -79,10 +86,12 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Reads({{ .Name | title }}{})) // from the request
 
-	ws.Route(ws.POST("").To(u.create{{ .Name | title }}).
+	ws.Route(ws.POST("/create").To(u.create{{ .Name | title }}).
 		//Authorization middleware. To be implemented
 		Filter(mid.AuthzMiddleware).
 		{{ if eq .AuthType "jwt" -}}
+		//Enable security
+		Metadata(utils.SecurityDefinitionKey, utils.OAISecurity{Name: "jwt"}).
 		// Jwt auth middleware
 		Filter(mid.AuthJWT).
 		{{- end }}
@@ -95,6 +104,8 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 		//Authorization middleware. To be implemented
 		Filter(mid.AuthzMiddleware).
 		{{ if eq .AuthType "jwt" -}}
+		//Enable security
+		Metadata(utils.SecurityDefinitionKey, utils.OAISecurity{Name: "jwt"}).
 		// Jwt auth middleware
 		Filter(mid.AuthJWT).
 		{{- end }}

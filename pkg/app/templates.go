@@ -28,3 +28,9 @@ var jwtGoTmpl embed.FS
 
 //go:embed templates/authz.go.gotmpl
 var authzGoTmpl embed.FS
+
+//go:embed templates/swagger_helper.go.gotmpl
+var swaggerHelperGoTmpl embed.FS
+
+//go:embed templates/gitignore.gotmpl
+var gitignoreTmpl embed.FS
