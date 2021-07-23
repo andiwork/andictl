@@ -5,9 +5,6 @@ import "embed"
 //go:embed templates/factory.go.gotmpl
 var factoryTmpl embed.FS
 
-//go:embed templates/default.go.gotmpl
-var defaultTmpl embed.FS
-
 //go:embed templates/hello.go.gotmpl
 var helloTmpl embed.FS
 

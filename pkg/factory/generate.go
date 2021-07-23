@@ -23,9 +23,6 @@ func Generate(factory configs.AndiFactory) {
 	data, _ := factoryTmpl.ReadFile("templates/factory.go.gotmpl")
 	utils.ProcessTmplFiles(packPath, factorySlug+"_factory.go", data, factory, false)
 
-	data, _ = defaultTmpl.ReadFile("templates/default.go.gotmpl")
-	utils.ProcessTmplFiles(packPath, factorySlug+"_default.go", data, factory, false)
-
 	data, _ = helloTmpl.ReadFile("templates/hello.go.gotmpl")
 	utils.ProcessTmplFiles(packPath, "dummy_hello.go", data, factory, false)
 

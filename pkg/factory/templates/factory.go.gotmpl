@@ -6,20 +6,20 @@ type {{ .Name | title }}Factory interface {
 	SayHello() (result string)
 }
 
-var {{ .Name }}s = make(map[string]{{ .Name | title }}Factory)
+var {{ .Name | toLower }}s = make(map[string]{{ .Name | title }}Factory)
 
 // Register is called to register a {{ .Name }}Factory.
-func Register(factType string, {{ .Name }} {{ .Name | title }}Factory) {
-	if _, exists := {{ .Name }}s[factType]; exists {
+func Register(factType string, {{ .Name | toLower }} {{ .Name | title }}Factory) {
+	if _, exists := {{ .Name | toLower }}s[factType]; exists {
 		log.Println(factType, "{{ .Name | title }}Factory already registered")
 	}
 
 	log.Println("Register", factType, "{{ .Name }}")
-	{{ .Name }}s[factType] = {{ .Name }}
+	{{ .Name | toLower }}s[factType] = {{ .Name | toLower }}
 }
 
-func Call{{ .Name | title }}Factory(factType string) ({{ .Name }} {{ .Name | title }}Factory, exists bool) {
-	if {{ .Name }}, exists = {{ .Name }}s[factType]; !exists {
+func Call{{ .Name | title }}Factory(factType string) ({{ .Name | toLower }} {{ .Name | title }}Factory, exists bool) {
+	if {{ .Name | toLower }}, exists = {{ .Name | toLower }}s[factType]; !exists {
 		log.Println(factType, "{{ .Name | title }}Factory not registered")
 	}
 	return
