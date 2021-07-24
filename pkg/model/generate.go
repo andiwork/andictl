@@ -80,9 +80,23 @@ func Generate(model configs.AndiModel) {
 		data, _ = restfulWebserviceGoTmpl.ReadFile("templates/restful.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "restful.go", data, templateData, false)
 
-		defer utils.ExecShellCommand("go", []string{"mod", "tidy"}, false)
-		//Update andictl.yaml with new model
+		// create model test case
+		testsPath := configs.AppDir + "pkg/tests"
+		os.MkdirAll(testsPath, os.ModePerm)
+		data, _ = serviceTestGoTmpl.ReadFile("templates/model_service_test.go.gotmpl")
+		utils.ProcessTmplFiles(testsPath, modelSlug+"_service_test.go", data, model, false)
+
+		data, _ = mockModelRepoGoTmpl.ReadFile("templates/mock_model_repository.go.gotmpl")
+		utils.ProcessTmplFiles(testsPath, "mock_"+modelSlug+"_repository.go", data, model, false)
+
+		data, _ = testReadMdTmpl.ReadFile("templates/README.md.gotmpl")
+		utils.ProcessTmplFiles(testsPath, "README.md", data, model, false)
+
+		//Update andi.yaml with new model
 		updateAndictlConfFile(model.Name, model.Package, models)
+
+		defer utils.ExecShellCommand("go", []string{"mod", "tidy"}, false)
+
 	} else {
 		conf := viper.ConfigFileUsed()
 		fmt.Println("model", model.Name, "already exist. Take a look at the conf file:", conf)

@@ -17,6 +17,7 @@ func ProcessTmplFiles(folder string, dstFileName string, tmplFile []byte, tmplDa
 		"andictlSlugify":    AndictlSlugify,
 		"toLower":           strings.ToLower,
 		"title":             strings.Title,
+		"uuidNew":           uuid.New,
 	}).Parse(string(tmplFile))
 	tmpl = template.Must(tmpl, err)
 	if err != nil {

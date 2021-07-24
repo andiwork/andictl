@@ -1,0 +1,164 @@
+package tests
+
+import (
+	"{{.Module}}/pkg/{{ .Name | toLower }}"
+	"testing"
+	"time"
+
+	gomock "github.com/golang/mock/gomock"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
+)
+
+var (
+	{{ .Name | toLower }}Id uuid.UUID
+)
+
+func init() {
+	{{ .Name | toLower }}Id, _ = uuid.Parse("{{ uuidNew }}")
+
+}
+func TestAdd{{ .Name | title }}Service(t *testing.T) {
+	// Arrange data with GormRepository mocked
+	ctrl := gomock.NewController(t)
+	repo := NewMockGorm{{ .Name | title }}Repository(ctrl)
+	data := {{ .Name | toLower }}.{{ .Name | title }}{}
+	repo.EXPECT().Add{{ .Name | title }}(&data).DoAndReturn(func(m *{{ .Name | toLower }}.{{ .Name | title }}) error {
+		data.ID = {{ .Name | toLower }}Id
+		data.CreatedAt = time.Now()
+		return nil
+	})
+
+	// Act
+	err := {{ .Name | toLower }}.Add{{ .Name | title }}Service(&data, repo)
+
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, data.ID, {{ .Name | toLower }}Id, "they should be equal")
+	assert.NotNil(t, data.CreatedAt)
+
+}
+
+func TestGet{{ .Name | title }}ByIdService(t *testing.T) {
+	// Arrange data with GormRepository mocked
+	ctrl := gomock.NewController(t)
+	repo := NewMockGorm{{ .Name | title }}Repository(ctrl)
+	data := {{ .Name | toLower }}.{{ .Name | title }}{}
+	data.ID = {{ .Name | toLower }}Id
+	data.CreatedAt = time.Now()
+	repo.EXPECT().Get{{ .Name | title }}ById({{ .Name | toLower }}Id).Return(data, nil)
+
+	// Act
+	result, err := {{ .Name | toLower }}.Get{{ .Name | title }}ByIdService({{ .Name | toLower }}Id, repo)
+
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, data.ID, result.ID, "they should be equal")
+	assert.Equal(t, data.CreatedAt, result.CreatedAt, "they should be equal")
+
+}
+
+func TestGet{{ .Name | title }}ByIdServiceWithNotfound(t *testing.T) {
+	// Arrange data with GormRepository mocked
+	ctrl := gomock.NewController(t)
+	repo := NewMockGorm{{ .Name | title }}Repository(ctrl)
+	// Mock gorm not found
+	repo.EXPECT().Get{{ .Name | title }}ById({{ .Name | toLower }}Id).Return({{ .Name | toLower }}.{{ .Name | title }}{}, gorm.ErrRecordNotFound)
+
+	// Act
+	_, err := {{ .Name | toLower }}.Get{{ .Name | title }}ByIdService({{ .Name | toLower }}Id, repo)
+
+	// Assert
+	assert.NotNil(t, err)
+	assert.Equal(t, err, gorm.ErrRecordNotFound)
+}
+
+func TestGetAll{{ .Name | title }}Service(t *testing.T) {
+	// Arrange data with GormRepository mocked
+	ctrl := gomock.NewController(t)
+	repo := NewMockGorm{{ .Name | title }}Repository(ctrl)
+	query := make(map[string]string)
+	order := "created_at desc"
+	limit := 0
+	offset := 0
+	// data1
+	data1Id, _ := uuid.Parse("{{ uuidNew }}")
+	data1 := {{ .Name | toLower }}.{{ .Name | title }}{}
+	data1.ID = data1Id
+	data1.CreatedAt = time.Now()
+
+	// data2
+	data2Id, _ := uuid.Parse("{{ uuidNew }}")
+	data2 := {{ .Name | toLower }}.{{ .Name | title }}{}
+	data2.ID = data2Id
+	data2.CreatedAt = time.Now()
+
+	datas := make([]{{ .Name | toLower }}.{{ .Name | title }}, 0)
+	datas = append(datas, data1, data2)
+	repo.EXPECT().GetAll{{ .Name | title }}(query, order, limit, offset).Return(datas, nil)
+
+	// Act
+
+	result, err := {{ .Name | toLower }}.GetAll{{ .Name | title }}Service(query, order, limit, offset, repo)
+
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, len(result), 2, "they should be equal")
+	assert.NotNil(t, result[0])
+	assert.NotNil(t, result[1])
+
+}
+
+func TestUpdate{{ .Name | title }}ByIdService(t *testing.T) {
+	// Arrange data with GormRepository mocked
+	ctrl := gomock.NewController(t)
+	repo := NewMockGorm{{ .Name | title }}Repository(ctrl)
+	// data
+	data := {{ .Name | toLower }}.{{ .Name | title }}{}
+	data.ID = {{ .Name | toLower }}Id
+	creationDate := time.Now()
+	data.CreatedAt = creationDate
+	data.UpdatedAt = creationDate
+	updateDate := time.Now()
+
+	repo.EXPECT().Update{{ .Name | title }}ById(&data).DoAndReturn(func(m *{{ .Name | toLower }}.{{ .Name | title }}) error {
+		data.UpdatedAt = updateDate
+		return nil
+	})
+
+	// Act
+	err := {{ .Name | toLower }}.Update{{ .Name | title }}ByIdService(&data, repo)
+
+	// Assert
+	assert.Nil(t, err)
+	assert.NotEqual(t, data.CreatedAt, data.UpdatedAt, "they should not be equal")
+	assert.Equal(t, updateDate, data.UpdatedAt, "they should be equal")
+
+}
+
+func TestDelete{{ .Name | title }}Service(t *testing.T) {
+	// Arrange data with GormRepository mocked
+	ctrl := gomock.NewController(t)
+	repo := NewMockGorm{{ .Name | title }}Repository(ctrl)
+	// data
+	data := {{ .Name | toLower }}.{{ .Name | title }}{}
+	data.ID = {{ .Name | toLower }}Id
+	data.CreatedAt = time.Now()
+	deletionDate := gorm.DeletedAt{Time: time.Now()}
+
+	repo.EXPECT().Delete{{ .Name | title }}({{ .Name | toLower }}Id).DoAndReturn(func(id uuid.UUID) error {
+
+		data.DeletedAt = deletionDate
+		return nil
+	})
+
+	// Act
+	err := {{ .Name | toLower }}.Delete{{ .Name | title }}Service({{ .Name | toLower }}Id, repo)
+
+	// Assert
+	assert.Nil(t, err)
+	assert.NotNil(t, data.DeletedAt)
+	assert.Equal(t, deletionDate, data.DeletedAt)
+
+}

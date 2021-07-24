@@ -1,0 +1,7 @@
+# Test
+Repo is mocked using mockgen
+# Command
+mockgen -source=pkg/{{ .Name | toLower }}/{{ .Name | toLower }}_repository.go  -destination=pkg/tests/mock_{{ .Name | toLower }}_repository.go -package=tests
+
+# Run tests
+go test -v {{.Module}}/pkg/tests

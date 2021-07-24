@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Repository represent the repositories
+// Gorm{{ .Name | title }}Repository interface represent the repository
 type Gorm{{ .Name | title }}Repository interface {
 	Add{{ .Name | title }}(m *{{ .Name | title }}) (err error)
 	Get{{ .Name | title }}ById(id uuid.UUID) (model {{ .Name | title }}, err error)

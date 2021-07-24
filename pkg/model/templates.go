@@ -22,3 +22,12 @@ var gormMigrateTmpl embed.FS
 
 //go:embed templates/restful.go.gotmpl
 var restfulWebserviceGoTmpl embed.FS
+
+//go:embed templates/model_service_test.go.gotmpl
+var serviceTestGoTmpl embed.FS
+
+//go:embed templates/mock_model_repository.go.gotmpl
+var mockModelRepoGoTmpl embed.FS
+
+//go:embed templates/README.md.gotmpl
+var testReadMdTmpl embed.FS
