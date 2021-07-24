@@ -44,7 +44,7 @@ var rootCmd = &cobra.Command{
 			// If a config file is found, read it in.
 			if err := viper.ReadInConfig(); err != nil {
 				// perform the questions
-				_, err := os.Create(configs.AppDir + ".andictl.yaml")
+				_, err := os.Create(configs.AppDir + ".andi.yaml")
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(0)
@@ -111,7 +111,7 @@ func initConfig() {
 	// Search config in home directory with name ".andictl" (without extension).
 	viper.AddConfigPath(configs.AppDir)
 	viper.SetConfigType("yaml")
-	viper.SetConfigName(".andictl")
+	viper.SetConfigName(".andi")
 	viper.AutomaticEnv() // read in environment variables that match
 }
 

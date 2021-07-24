@@ -27,8 +27,8 @@ func Generate(model configs.AndiModel) {
 	modelSlug := utils.AndictlSlugify(model.Name)
 	appModule = model.Module
 	//fetch model in config file
-	exist, models := IsKeyInConfFile("models", "name", modelSlug)
-
+	exist, models := IsKeyInConfFile("models", "name", model.Name)
+	//fmt.Println(modelSlug, "IsKeyInConfFile exist:", len(exist))
 	if len(exist) == 0 {
 		// set application AuthType
 		model.AuthType = viper.GetString("application.authtype")
@@ -104,15 +104,18 @@ func updateAndictlConfFile(modelName string, modelPackage string, models []map[i
 
 //IsKeyInConfFile search an element identified by searchKey=searchValue in config file
 func IsKeyInConfFile(getKey string, searchKey string, searchValue string) (exist []map[interface{}]interface{}, entries []map[interface{}]interface{}) {
+	//fmt.Println(" === seach key ===", getKey, searchKey, searchValue)
 	fromFile := viper.Get(getKey)
 	if fromFile != nil && reflect.TypeOf(fromFile) != reflect.TypeOf("string") {
 		elements := fromFile.([]interface{})
-		//fmt.Println("get model 0 ", models[0].(map[interface{}]interface{})["package"])
+		//fmt.Println("get elements 0 ", elements[0].(map[interface{}]interface{})["package"])
 		for _, v := range elements {
 			value := v.(map[interface{}]interface{})
 			entries = append(entries, value)
+			//fmt.Println("append ", value, searchValue)
 			if value[searchKey] == searchValue {
 				exist = append(exist, value)
+				//fmt.Println("find:", searchValue, "in", viper.ConfigFileUsed())
 			}
 		}
 	}

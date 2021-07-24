@@ -14,7 +14,7 @@ type Gorm{{ .Name | title }}Repository interface {
 	GetAll{{ .Name | title }}(query map[string]string, order string,
 		offset int, limit int) (models []{{ .Name | title }}, err error)
 	Update{{ .Name | title }}ById(model *{{ .Name | title }}) (err error)
-	Delete{{ .Name | title }}(id uuid.UUID)
+	Delete{{ .Name | title }}(id uuid.UUID) (err error)
 }
 
 type {{ .Name | title }}Repository struct {
@@ -23,21 +23,21 @@ type {{ .Name | title }}Repository struct {
 
 // Add{{ .Name | title }} insert a new {{ .Name | title }} into database and returns
 // last inserted Id on success.
-func (r *{{ .Name | title }}Repository) Add{{ .Name | title }}(m *{{ .Name | title }}) (err error) {
+func (r {{ .Name | title }}Repository) Add{{ .Name | title }}(m *{{ .Name | title }}) (err error) {
 	err = r.Db.Create(m).Error
 	return
 }
 
 // Get{{ .Name | title }}ById retrieves {{ .Name | title }} by Id. Returns error if
 // Id doesn't exist
-func (r *{{ .Name | title }}Repository) Get{{ .Name | title }}ById(id uuid.UUID) (model {{ .Name | title }}, err error) {
+func (r {{ .Name | title }}Repository) Get{{ .Name | title }}ById(id uuid.UUID) (model {{ .Name | title }}, err error) {
 	err = r.Db.First(&model, "id = ?", id).Error
 	return
 }
 
 // GetAll{{ .Name | title }} retrieves all {{ .Name | title }} matches certain condition. Returns empty list if
 // no records exist
-func (r *{{ .Name | title }}Repository) GetAll{{ .Name | title }}(query map[string]string, order string,
+func (r {{ .Name | title }}Repository) GetAll{{ .Name | title }}(query map[string]string, order string,
 	offset int, limit int) (models []{{ .Name | title }}, err error) {
 	log.Println("query :", query, " order:", order, " limit:", limit, "offset:", offset)
 	err = r.Db.Where(query).Order(order).
@@ -48,14 +48,14 @@ func (r *{{ .Name | title }}Repository) GetAll{{ .Name | title }}(query map[stri
 
 // Update{{ .Name | title }} updates {{ .Name | title }} by Id and returns error if
 // the record to be updated doesn't exist
-func (r *{{ .Name | title }}Repository) Update{{ .Name | title }}ById(model *{{ .Name | title }}) (err error) {
+func (r {{ .Name | title }}Repository) Update{{ .Name | title }}ById(model *{{ .Name | title }}) (err error) {
 	err = r.Db.Save(model).Error
 	return
 }
 
 // Delete{{ .Name | title }} deletes {{ .Name | title }} by Id and returns error if
 // the record to be deleted doesn't exist
-func (r *{{ .Name | title }}Repository) Delete{{ .Name | title }}(id uuid.UUID) (err error) {
+func (r {{ .Name | title }}Repository) Delete{{ .Name | title }}(id uuid.UUID) (err error) {
 	err = r.Db.Delete(new({{ .Name | title }}), id).Error
 	return
 }
