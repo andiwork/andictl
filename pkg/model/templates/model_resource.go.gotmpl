@@ -26,7 +26,7 @@ func New{{ .Name | title }}Resource(con *gorm.DB) {{ .Name | title }}Resource {
 
 // WebService creates a new service that can handle REST requests for {{ .Name | title }} resources.
 func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
-	repo = {{ .Name | title }}Repository{db: u.db}
+	repo = {{ .Name | title }}Repository{Db: u.db}
 	ws := new(restful.WebService)
 	ws.
 		Path("/{{.ApiVersion}}/{{ .Name | toLower }}").
