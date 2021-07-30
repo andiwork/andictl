@@ -34,3 +34,6 @@ var swaggerHelperGoTmpl embed.FS
 
 //go:embed templates/gitignore.gotmpl
 var gitignoreTmpl embed.FS
+
+//go:embed templates/db_singleton.go.gotmpl
+var dbSingletionTmpl embed.FS

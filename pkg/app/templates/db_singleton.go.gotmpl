@@ -1,0 +1,97 @@
+package utils
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"sync"
+	"time"
+
+	"github.com/spf13/viper"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+)
+
+var err error
+
+type Database struct {
+	Driver   string
+	Host     string
+	Port     string
+	Name     string
+	Username string
+	Password string
+}
+
+type App struct {
+	Db Database `mapstructure:"database"`
+}
+type DbConnectionPool struct {
+}
+
+var instance *DbConnectionPool
+var once sync.Once
+
+var db *gorm.DB
+
+func GetInstance() *DbConnectionPool {
+	once.Do(func() {
+		instance = &DbConnectionPool{}
+	})
+	return instance
+}
+
+func (d *DbConnectionPool) GormConfigs() (ok bool) {
+	app := App{}
+	if err := viper.Unmarshal(&app); err != nil {
+		fmt.Printf("couldn't read config: %s", err)
+	}
+	devMode := viper.GetBool("devmode")
+
+	var newLogger logger.Interface
+	if devMode {
+		newLogger = logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold:             time.Second, // Slow SQL threshold
+				LogLevel:                  logger.Info, // Log level
+				IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+				Colorful:                  false,       // Disable color
+			},
+		)
+	} else {
+		newLogger = logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold:             time.Second,  // Slow SQL threshold
+				LogLevel:                  logger.Error, // Log level
+				IgnoreRecordNotFoundError: true,         // Ignore ErrRecordNotFound error for logger
+				Colorful:                  false,        // Disable color
+			},
+		)
+	}
+
+	switch app.Db.Driver {
+	case "mysql":
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", app.Db.Username, app.Db.Password, app.Db.Host, app.Db.Port, app.Db.Name)
+		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogger})
+		break
+	case "postgres":
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable ", app.Db.Host, app.Db.Username, app.Db.Password, app.Db.Name, app.Db.Port)
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: newLogger})
+		break
+	default:
+		panic("Supported driver: mysql and postgres")
+	}
+	if err != nil {
+		log.Fatal("Database error", err)
+		return false
+	}
+	return true
+}
+
+func (m *DbConnectionPool) GetDB() (db_con *gorm.DB) {
+	return db
+}

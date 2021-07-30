@@ -2,9 +2,8 @@ package {{.Package}}
 
 import (
 	"log"
-
+	"{{.Module}}/utils"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 // Gorm{{ .Name | title }}Repository interface represent the repository
@@ -17,21 +16,21 @@ type Gorm{{ .Name | title }}Repository interface {
 	Delete{{ .Name | title }}(id uuid.UUID) (err error)
 }
 
-type {{ .Name | title }}Repository struct {
-	Db *gorm.DB
-}
+type {{ .Name | title }}Repository struct {}
 
 // Add{{ .Name | title }} insert a new {{ .Name | title }} into database and returns
 // last inserted Id on success.
 func (r {{ .Name | title }}Repository) Add{{ .Name | title }}(m *{{ .Name | title }}) (err error) {
-	err = r.Db.Create(m).Error
+	db := utils.GetInstance().GetDB()
+	err = db.Create(m).Error
 	return
 }
 
 // Get{{ .Name | title }}ById retrieves {{ .Name | title }} by Id. Returns error if
 // Id doesn't exist
 func (r {{ .Name | title }}Repository) Get{{ .Name | title }}ById(id uuid.UUID) (model {{ .Name | title }}, err error) {
-	err = r.Db.First(&model, "id = ?", id).Error
+	db := utils.GetInstance().GetDB()
+	err = db.First(&model, "id = ?", id).Error
 	return
 }
 
@@ -40,7 +39,8 @@ func (r {{ .Name | title }}Repository) Get{{ .Name | title }}ById(id uuid.UUID) 
 func (r {{ .Name | title }}Repository) GetAll{{ .Name | title }}(query map[string]string, order string,
 	offset int, limit int) (models []{{ .Name | title }}, err error) {
 	log.Println("query :", query, " order:", order, " limit:", limit, "offset:", offset)
-	err = r.Db.Where(query).Order(order).
+	db := utils.GetInstance().GetDB()
+	err = db.Where(query).Order(order).
 		Limit(limit).Offset(offset).
 		Find(&models).Error
 	return
@@ -49,13 +49,15 @@ func (r {{ .Name | title }}Repository) GetAll{{ .Name | title }}(query map[strin
 // Update{{ .Name | title }} updates {{ .Name | title }} by Id and returns error if
 // the record to be updated doesn't exist
 func (r {{ .Name | title }}Repository) Update{{ .Name | title }}ById(model *{{ .Name | title }}) (err error) {
-	err = r.Db.Save(model).Error
+	db := utils.GetInstance().GetDB()
+	err = db.Save(model).Error
 	return
 }
 
 // Delete{{ .Name | title }} deletes {{ .Name | title }} by Id and returns error if
 // the record to be deleted doesn't exist
 func (r {{ .Name | title }}Repository) Delete{{ .Name | title }}(id uuid.UUID) (err error) {
-	err = r.Db.Delete(new({{ .Name | title }}), id).Error
+	db := utils.GetInstance().GetDB()
+	err = db.Delete(new({{ .Name | title }}), id).Error
 	return
 }

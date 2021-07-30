@@ -16,17 +16,15 @@ import (
 var repo {{ .Name | title }}Repository
 
 // {{ .Name | title }}Resource is the REST layer to the {{ .Name | title }} domain
-type {{ .Name | title }}Resource struct {
-	db *gorm.DB
-}
+type {{ .Name | title }}Resource struct {}
 
-func New{{ .Name | title }}Resource(con *gorm.DB) {{ .Name | title }}Resource {
-	return {{ .Name | title }}Resource{db: con}
+func New{{ .Name | title }}Resource() {{ .Name | title }}Resource {
+	return {{ .Name | title }}Resource{}
 }
 
 // WebService creates a new service that can handle REST requests for {{ .Name | title }} resources.
 func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
-	repo = {{ .Name | title }}Repository{Db: u.db}
+	repo = {{ .Name | title }}Repository{}
 	ws := new(restful.WebService)
 	ws.
 		Path("/{{.ApiVersion}}/{{ .Name | toLower }}").

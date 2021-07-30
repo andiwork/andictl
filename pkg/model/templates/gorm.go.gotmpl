@@ -1,67 +1,14 @@
 package configs
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"time"
-	"gorm.io/driver/mysql"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	{{- range $package, $module := . }}
 	"{{$module}}/pkg/{{$package}}"
 	{{ end -}}
 )
 
-var GormDb *gorm.DB
-var err error
-
-func migrateSchema() {
+func MigrateSchema(db *gorm.DB) {
 	{{- range $package, $module := . }}
-	GormDb.AutoMigrate({{$package}}.Migrate()...)
+	db.AutoMigrate({{$package}}.Migrate()...)
 	{{ end }}
-}
-
-func GormConfigs(app AppConfig) {
-
-	var newLogger logger.Interface
-	if app.DevMode {
-		newLogger = logger.New(
-			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-			logger.Config{
-				SlowThreshold:             time.Second, // Slow SQL threshold
-				LogLevel:                  logger.Info, // Log level
-				IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
-				Colorful:                  false,       // Disable color
-			},
-		)
-	} else {
-		newLogger = logger.New(
-			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-			logger.Config{
-				SlowThreshold:             time.Second,  // Slow SQL threshold
-				LogLevel:                  logger.Error, // Log level
-				IgnoreRecordNotFoundError: true,         // Ignore ErrRecordNotFound error for logger
-				Colorful:                  false,        // Disable color
-			},
-		)
-	}
-
-	switch app.Db.Driver {
-	case "mysql":
-		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",app.Db.Username, app.Db.Password, app.Db.Host, app.Db.Port, app.Db.Name)
-		GormDb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogger})
-		break
-	case "postgres":
-		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable ", app.Db.Host, app.Db.Username, app.Db.Password, app.Db.Name, app.Db.Port)
-		GormDb, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: newLogger})
-		break
-	default:
-		panic("Supported driver: mysql and postgres")
-	}
-	if err != nil {
-		log.Fatalf("Database error", err)
-	}
-	migrateSchema()
 }

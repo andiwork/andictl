@@ -96,6 +96,8 @@ func Generate() {
 			utils.ProcessTmplFiles(configs.AppDir+"pkg/middleware", "jwt.go", data, nil, false)
 			data, _ = swaggerHelperGoTmpl.ReadFile("templates/swagger_helper.go.gotmpl")
 			utils.ProcessTmplFiles(configs.AppDir+"utils", "swagger_helper.go", data, nil, false)
+			data, _ = dbSingletionTmpl.ReadFile("templates/db_singleton.go.gotmpl")
+			utils.ProcessTmplFiles(configs.AppDir+"utils", "db_singleton.go", data, nil, false)
 			wg.Done()
 		}()
 

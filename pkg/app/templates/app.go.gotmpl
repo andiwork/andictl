@@ -50,6 +50,5 @@ func InitAppConfigs() (config AppConfig) {
 	if err := viper.Unmarshal(&config); err != nil {
 		fmt.Printf("couldn't read config: %s", err)
 	}
-	GormConfigs(config)
 	return
 }

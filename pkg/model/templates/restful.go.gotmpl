@@ -13,7 +13,7 @@ var apiDocsPath = "/apidocs/"
 
 func InitWebservices() {
 	{{- range  .Data }}
-	restful.DefaultContainer.Add({{.package}}.New{{ .name | title }}Resource(GormDb).WebService())
+	restful.DefaultContainer.Add({{.package}}.New{{ .name | title }}Resource().WebService())
 	{{ end -}}
 
 	// Get swagger configurations
