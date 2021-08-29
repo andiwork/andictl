@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var repo {{ .Name | title }}Repository
+var repo{{ .Name | title }} {{ .Name | title }}Repository
 
 // {{ .Name | title }}Resource is the REST layer to the {{ .Name | title }} domain
 type {{ .Name | title }}Resource struct {}
@@ -24,7 +24,7 @@ func New{{ .Name | title }}Resource() {{ .Name | title }}Resource {
 
 // WebService creates a new service that can handle REST requests for {{ .Name | title }} resources.
 func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
-	repo = {{ .Name | title }}Repository{}
+	repo{{ .Name | title }} = {{ .Name | title }}Repository{}
 	ws := new(restful.WebService)
 	ws.
 		Path("/{{.ApiVersion}}/{{ .Name | toLower }}").
@@ -137,7 +137,7 @@ func (u {{ .Name | title }}Resource) findAll{{ .Name | title }}s(request *restfu
 	if order == "" {
 		order = "created_at desc"
 	}
-	list, err := GetAll{{ .Name | title }}Service(query, order, offset, limit, repo)
+	list, err := GetAll{{ .Name | title }}Service(query, order, offset, limit, repo{{ .Name | title }})
 	if err != nil {
 		response.WriteError(http.StatusInternalServerError, err)
 	}
@@ -148,7 +148,7 @@ func (u {{ .Name | title }}Resource) findAll{{ .Name | title }}s(request *restfu
 //
 func (u {{ .Name | title }}Resource) find{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	uuid, _ := uuid.Parse(request.PathParameter("id"))
-	{{ .Name | title }}, err := Get{{ .Name | title }}ByIdService(uuid, repo)
+	{{ .Name | title }}, err := Get{{ .Name | title }}ByIdService(uuid, repo{{ .Name | title }})
 
 	if err == gorm.ErrRecordNotFound {
 		response.WriteErrorString(http.StatusNotFound, "{{ .Name | title }} could not be found.")
@@ -162,7 +162,7 @@ func (u {{ .Name | title }}Resource) find{{ .Name | title }}(request *restful.Re
 func (u *{{ .Name | title }}Resource) update{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	var {{ .Name | title }} {{ .Name | title }}
 	err := request.ReadEntity(&{{ .Name | title }})
-	err = Update{{ .Name | title }}ByIdService(&{{ .Name | title }}, repo)
+	err = Update{{ .Name | title }}ByIdService(&{{ .Name | title }}, repo{{ .Name | title }})
 	if err == nil {
 		response.WriteEntity({{ .Name | title }})
 	} else {
@@ -175,7 +175,7 @@ func (u *{{ .Name | title }}Resource) update{{ .Name | title }}(request *restful
 func (u *{{ .Name | title }}Resource) create{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	{{ .Name | toLower }} := {{ .Name | title }}{}
 	err := request.ReadEntity(&{{ .Name | toLower }})
-	Add{{ .Name | title }}Service(&{{ .Name | toLower }}, repo)
+	Add{{ .Name | title }}Service(&{{ .Name | toLower }}, repo{{ .Name | title }})
 	if err == nil {
 		response.WriteHeaderAndEntity(http.StatusCreated, {{ .Name | toLower }})
 	} else {
@@ -187,7 +187,7 @@ func (u *{{ .Name | title }}Resource) create{{ .Name | title }}(request *restful
 //
 func (u *{{ .Name | title }}Resource) remove{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	uuid, _ := uuid.Parse(request.PathParameter("id"))
-	err := Delete{{ .Name | title }}Service(uuid, repo)
+	err := Delete{{ .Name | title }}Service(uuid, repo{{ .Name | title }})
 	if err == nil {
 		response.WriteHeader(http.StatusCreated)
 	} else {

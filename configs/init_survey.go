@@ -37,7 +37,7 @@ func InitSurvey() (answers Application, err error) {
 			Prompt: &survey.Select{
 				Message: "Which type of authentication would you like to use?",
 				Options: []string{"none", "jwt"},
-				Default: "none",
+				Default: "jwt",
 			},
 			Validate: survey.Required,
 		},
@@ -45,7 +45,7 @@ func InitSurvey() (answers Application, err error) {
 			Name: "databaseType",
 			Prompt: &survey.Select{
 				Message: "Which type of database would you like to use?",
-				Options: []string{"non", "postgres", "mysql"},
+				Options: []string{"none", "postgres", "mysql"},
 				Default: "postgres",
 			},
 			Validate: survey.Required,

@@ -7,6 +7,6 @@ database:
   driver: "{{.App.DatabaseType}}"
   host: "127.0.0.1"
   {{ if eq .App.DatabaseType  "postgres" }}port: 5432{{ else }}port: 3306{{ end }}
-  name: "{{.App.Name}}"
-  username: "{{.App.Name}}"
-  password: "{{.App.Name}}"
+  name: "{{.App.Name | replace}}"
+  username: "{{.App.Name | replace}}"
+  password: "{{.App.Name | replace}}"

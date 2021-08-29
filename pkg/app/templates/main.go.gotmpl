@@ -3,18 +3,22 @@ package main
 import (
 	"log"
 	"{{.App.Name}}/configs"
+	{{ if ne .App.DatabaseType "none"}}
 	"{{.App.Name}}/utils"
+	{{- end }}
 	"net/http"
 )
 
 func main() {
 	app := configs.InitAppConfigs()
 	configs.InitWebservices()
+	{{ if ne .App.DatabaseType "none"}}
 	ok := utils.GetInstance().GormConfigs()
 	if !ok {
 		log.Fatal("init database pool failure...")
 	}
 	configs.MigrateSchema(utils.GetInstance().GetDB())
+	{{- end }}
 	log.Printf("Application name: %s\n", app.Name)
 	log.Printf("Environment:  %s\n", app.Env)
 	log.Printf("Starting server at port %s\n.", app.Port)

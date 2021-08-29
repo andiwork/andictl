@@ -18,6 +18,7 @@ func ProcessTmplFiles(folder string, dstFileName string, tmplFile []byte, tmplDa
 		"toLower":           strings.ToLower,
 		"title":             strings.Title,
 		"uuidNew":           uuid.New,
+		"replace":           HyphenToDash,
 	}).Parse(string(tmplFile))
 	tmpl = template.Must(tmpl, err)
 	if err != nil {
@@ -49,6 +50,10 @@ func UuidWithOutHyphen() (value string) {
 	uuidWithHyphen := uuid.New()
 	value = strings.Replace(uuidWithHyphen.String(), "-", "", -1)
 	return
+}
+
+func HyphenToDash(text string) string {
+	return strings.Replace(text, "-", "_", -1)
 }
 
 func AndictlSlugify(text string) string {

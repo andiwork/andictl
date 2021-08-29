@@ -3,7 +3,7 @@ package configs
 import (
 	"net/http"
 	{{ if eq .App.AuthType "jwt"}}
-	"{{.App.Name | andictlSlugify}}/utils"
+	"{{.App.Name }}/utils"
 	"log"
 	"strings"
 	{{ end }}
