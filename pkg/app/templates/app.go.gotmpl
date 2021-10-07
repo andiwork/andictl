@@ -31,12 +31,13 @@ func init() {
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
 	viper.BindPFlags(pflag.CommandLine)
-	viper.SetEnvPrefix("{{ .App.Name | replace }}")
+	viper.SetEnvPrefix("{{ .App.Name | replace | toUpper}}")
 	viper.AutomaticEnv()
 }
 
 func InitAppConfigs() (config AppConfig) {
 	env := viper.GetString("env")
+	viper.AddConfigPath("$HOME/.{{ .App.Name | replace }}")
 	viper.AddConfigPath("./configs")
 	viper.SetConfigName("app")
 	if err := viper.ReadInConfig(); err != nil {

@@ -16,6 +16,7 @@ func ProcessTmplFiles(folder string, dstFileName string, tmplFile []byte, tmplDa
 		"uuidWithOutHyphen": UuidWithOutHyphen,
 		"andictlSlugify":    AndictlSlugify,
 		"toLower":           strings.ToLower,
+		"toUpper":           strings.ToUpper,
 		"title":             strings.Title,
 		"uuidNew":           uuid.New,
 		"replace":           HyphenToDash,
