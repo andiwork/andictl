@@ -118,7 +118,7 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 // GET http://localhost:8080/{{ .Name | toLower }}s
 //
 func (u {{ .Name | title }}Resource) findAll{{ .Name | title }}s(request *restful.Request, response *restful.Response) {
-	var query = make(map[string]string)
+	var query = make(map[string]interface{})
 	queryString := request.QueryParameter("query")
 	// query: k:v,k:v
 	if v := queryString; v != "" {

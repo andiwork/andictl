@@ -10,7 +10,7 @@ import (
 type Gorm{{ .Name | title }}Repository interface {
 	Add{{ .Name | title }}(m *{{ .Name | title }}) (err error)
 	Get{{ .Name | title }}ById(id uuid.UUID) (model {{ .Name | title }}, err error)
-	GetAll{{ .Name | title }}(query map[string]string, order string,
+	GetAll{{ .Name | title }}(query map[string]interface{}, order string,
 		offset int, limit int) (models []{{ .Name | title }}, err error)
 	Update{{ .Name | title }}ById(model *{{ .Name | title }}) (err error)
 	Delete{{ .Name | title }}(id uuid.UUID) (err error)
@@ -36,7 +36,7 @@ func (r {{ .Name | title }}Repository) Get{{ .Name | title }}ById(id uuid.UUID) 
 
 // GetAll{{ .Name | title }} retrieves all {{ .Name | title }} matches certain condition. Returns empty list if
 // no records exist
-func (r {{ .Name | title }}Repository) GetAll{{ .Name | title }}(query map[string]string, order string,
+func (r {{ .Name | title }}Repository) GetAll{{ .Name | title }}(query map[string]interface{}, order string,
 	offset int, limit int) (models []{{ .Name | title }}, err error) {
 	log.Println("query :", query, " order:", order, " limit:", limit, "offset:", offset)
 	db := utils.GetInstance().GetDB()

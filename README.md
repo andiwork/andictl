@@ -17,6 +17,7 @@
 - Fix ctrl + c bug. Intercept the os.Signal
 - Generate model with more fields
 - Exclude tests package in generate model package list
+- download air
 
 ## License
 

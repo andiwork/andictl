@@ -31,6 +31,8 @@ func init() {
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
 	viper.BindPFlags(pflag.CommandLine)
+	viper.SetEnvPrefix("{{ .App.Name | replace }}")
+	viper.AutomaticEnv()
 }
 
 func InitAppConfigs() (config AppConfig) {
