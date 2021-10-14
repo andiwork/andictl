@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type Database struct {
@@ -46,6 +47,14 @@ func InitAppConfigs() (config AppConfig) {
 	if env != "" {
 		viper.SetConfigName(env)
 		viper.MergeInConfig()
+		path, _ := os.Getwd()
+		log.SetOutput(&lumberjack.Logger{
+			Filename:   path + "/app.log",
+			MaxSize:    100, // megabytes
+			MaxBackups: 3,
+			MaxAge:     5,    //days
+			Compress:   true, // disabled by default
+		})
 	} else {
 		viper.Set("env", "default")
 	}
