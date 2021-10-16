@@ -12,6 +12,7 @@
 - Mockgen
 - Air
 - GoReleaser
+- Copier : https://github.com/jinzhu/copier
 
 ## Todos
 * [ ] Fix ctrl + c bug. Intercept the os.Signal
