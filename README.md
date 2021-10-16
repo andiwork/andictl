@@ -14,10 +14,13 @@
 - GoReleaser
 
 ## Todos
-- Fix ctrl + c bug. Intercept the os.Signal
-- Generate model with more fields
-- Exclude tests package in generate model package list
-- download air
+* [ ] Fix ctrl + c bug. Intercept the os.Signal
+* [ ] Generate model with more fields
+* [ ] Exclude tests package in generate model package list
+* [ ] download air
+* [ ] Update unit tests
+* [ ] Cron generator
+* [ ] Pack final package
 
 ## License
 
