@@ -14,6 +14,7 @@ type Gorm{{ .Name | title }}Repository interface {
 		offset int, limit int) (models []{{ .Name | title }}, err error)
 	Update{{ .Name | title }}ById(model *{{ .Name | title }}) (err error)
 	Delete{{ .Name | title }}(id uuid.UUID) (err error)
+	BatchInsert{{ .Name | title }}(models []{{ .Name | title }}) (err error)
 }
 
 type {{ .Name | title }}Repository struct {}
@@ -59,5 +60,12 @@ func (r {{ .Name | title }}Repository) Update{{ .Name | title }}ById(model *{{ .
 func (r {{ .Name | title }}Repository) Delete{{ .Name | title }}(id uuid.UUID) (err error) {
 	db := utils.GetInstance().GetDB()
 	err = db.Delete(new({{ .Name | title }}), id).Error
+	return
+}
+
+//BatchInsert{{ .Name | title }} add a list of {{ .Name | title }}
+func (r {{ .Name | title }}Repository) BatchInsert{{ .Name | title }}(models []{{ .Name | title }}) (err error) {
+	db := utils.GetInstance().GetDB()
+	err = db.Create(&models).Error
 	return
 }
