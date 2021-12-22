@@ -24,3 +24,7 @@ func Update{{ .Name | title }}ByIdService(m *{{ .Name | title }}, repo Gorm{{ .N
 func Delete{{ .Name | title }}Service(id uuid.UUID, repo Gorm{{ .Name | title }}Repository) (err error) {
 	return repo.Delete{{ .Name | title }}(id)
 }
+func BatchInsert{{ .Name | title }}Service(models []{{ .Name | title }}, repo  Gorm{{ .Name | title }}Repository) (err error) {
+	return repo.BatchInsert{{ .Name | title }}(models)
+}
+
