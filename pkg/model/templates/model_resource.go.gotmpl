@@ -46,7 +46,6 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 		Doc("get all {{ .Name | toLower }}s").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Param(ws.QueryParameter("query", "Filter. e.g. col1:v1,col2:v2").DataType("string").Required(false)).
-		Param(ws.QueryParameter("query", "Filter. e.g. col1:v1,col2:v2").DataType("string").Required(false)).
 		Param(ws.QueryParameter("order", "Order. e.g. col1 desc,col2").DataType("string").Required(false)).
 		Param(ws.QueryParameter("offset", "Start position of result set. Must be an integer").DataType("string").Required(false)).
 		Param(ws.QueryParameter("limit", "Limit the size of result set. Must be an integer").DataType("string").Required(false)).
