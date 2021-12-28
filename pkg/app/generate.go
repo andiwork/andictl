@@ -74,6 +74,10 @@ func Generate() {
 
 		data, _ = gormGoTmpl.ReadFile("templates/gorm.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "gorm.go", data, configs.AppConfs, false)
+
+		data, _ = customGormGoTmpl.ReadFile("templates/custom_gorm.go.gotmpl")
+		utils.ProcessTmplFiles(confDir, "custom_gorm.go", data, configs.AppConfs, false)
+		
 		wg.Done()
 	}()
 	go func() {

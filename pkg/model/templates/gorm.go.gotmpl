@@ -11,4 +11,7 @@ func MigrateSchema(db *gorm.DB) {
 	{{- range $package, $module := . }}
 	db.AutoMigrate({{$package}}.Migrate()...)
 	{{ end }}
+	if len(CustomModelMigrate()) > 0 {
+		db.AutoMigrate(CustomModelMigrate()...)
+	}
 }

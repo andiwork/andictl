@@ -37,3 +37,7 @@ var gitignoreTmpl embed.FS
 
 //go:embed templates/db_singleton.go.gotmpl
 var dbSingletionTmpl embed.FS
+
+//go:embed templates/custom_gorm.go.gotmpl
+var customGormGoTmpl embed.FS
+

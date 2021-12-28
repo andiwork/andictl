@@ -2,4 +2,8 @@ package configs
 
 import("gorm.io/gorm")
 
-func MigrateSchema(db *gorm.DB) {}
+func MigrateSchema(db *gorm.DB) {
+    if len(CustomModelMigrate()) > 0 {
+		db.AutoMigrate(CustomModelMigrate()...)
+	}
+}
