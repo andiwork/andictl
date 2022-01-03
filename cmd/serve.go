@@ -16,7 +16,11 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
+	"os"
+
 	"github.com/andiwork/andictl/utils"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +30,17 @@ var serveCmd = &cobra.Command{
 	Short: "Live reload for Go apps",
 	Long:  `Live reload for Go apps based on Air`,
 	Run: func(cmd *cobra.Command, args []string) {
-		utils.ExecShellCommand("air", nil, true)
+		home, err := homedir.Dir()
+		andictlHome := home + "/.andictl"
+		if err == nil {
+			if _, err := os.Stat(andictlHome + "/air"); errors.Is(err, os.ErrNotExist) {
+				os.MkdirAll(andictlHome, os.ModePerm)
+				air, _ := utils.DownloadFile("air-install.sh", "https://raw.githubusercontent.com/cosmtrek/air/master/install.sh")
+				utils.ExecShellCommand("sh "+air+" -b "+andictlHome, []string{}, false)
+			}
+
+		}
+		utils.ExecShellCommand(andictlHome+"/air", nil, true)
 	},
 }
 
