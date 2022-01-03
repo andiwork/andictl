@@ -77,7 +77,7 @@ func Generate() {
 
 		data, _ = customGormGoTmpl.ReadFile("templates/custom_gorm.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "custom_gorm.go", data, configs.AppConfs, false)
-		
+
 		wg.Done()
 	}()
 	go func() {
@@ -92,16 +92,17 @@ func Generate() {
 		wg.Done()
 	}()
 
+	os.MkdirAll(configs.AppDir+"utils", os.ModePerm)
+	data, _ := dbSingletionTmpl.ReadFile("templates/db_singleton.go.gotmpl")
+	utils.ProcessTmplFiles(configs.AppDir+"utils", "db_singleton.go", data, nil, false)
+
 	if configs.AppConfs.App.AuthType == "jwt" {
 		go func() {
 			wg.Add(1)
-			os.MkdirAll(configs.AppDir+"utils", os.ModePerm)
 			data, _ := jwtGoTmpl.ReadFile("templates/jwt.go.gotmpl")
 			utils.ProcessTmplFiles(configs.AppDir+"pkg/middleware", "jwt.go", data, nil, false)
 			data, _ = swaggerHelperGoTmpl.ReadFile("templates/swagger_helper.go.gotmpl")
 			utils.ProcessTmplFiles(configs.AppDir+"utils", "swagger_helper.go", data, nil, false)
-			data, _ = dbSingletionTmpl.ReadFile("templates/db_singleton.go.gotmpl")
-			utils.ProcessTmplFiles(configs.AppDir+"utils", "db_singleton.go", data, nil, false)
 			wg.Done()
 		}()
 

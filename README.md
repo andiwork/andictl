@@ -3,6 +3,15 @@
 ## Overview
 
 ## Getting Started
+### Installation
+Installation from source 
+```
+git clone git@github.com:andiwork/andictl.git
+go build .
+rm /usr/local/bin/andictl
+cp andictl /usr/local/bin/andictl
+chmod +x /usr/local/bin/andictl
+```
 
 ## Tools used
 - Gorm
