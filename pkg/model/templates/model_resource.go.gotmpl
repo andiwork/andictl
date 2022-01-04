@@ -6,7 +6,9 @@ import (
 	"strconv"
 	"strings"
 	mid "{{.Module}}/pkg/middleware"
+	{{ if eq .AuthType "jwt" -}}
 	"{{.Module}}/utils"
+	{{- end }}
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	restful "github.com/emicklei/go-restful/v3"
 	"github.com/google/uuid"
