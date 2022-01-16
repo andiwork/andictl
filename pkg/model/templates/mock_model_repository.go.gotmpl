@@ -49,6 +49,21 @@ func (mr *MockGorm{{ .Name | title }}RepositoryMockRecorder) Add{{ .Name | title
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add{{ .Name | title }}", reflect.TypeOf((*MockGorm{{ .Name | title }}Repository)(nil).Add{{ .Name | title }}), m)
 }
 
+// BatchInsert{{ .Name | title }} mocks base method.
+func (m *MockGorm{{ .Name | title }}Repository) BatchInsert{{ .Name | title }}(models []{{ .Name | toLower }}.{{ .Name | title }}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BatchInsert{{ .Name | title }}", models)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchInsert{{ .Name | title }} indicates an expected call of BatchInsert{{ .Name | title }}.
+func (mr *MockGorm{{ .Name | title }}RepositoryMockRecorder) BatchInsert{{ .Name | title }}(models interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchInsert{{ .Name | title }}", reflect.TypeOf((*MockGorm{{ .Name | title }}Repository)(nil).BatchInsert{{ .Name | title }}), models)
+}
+
+
 // Delete{{ .Name | title }} mocks base method.
 func (m *MockGorm{{ .Name | title }}Repository) Delete{{ .Name | title }}(id uuid.UUID) error {
 	m.ctrl.T.Helper()
@@ -79,7 +94,7 @@ func (mr *MockGorm{{ .Name | title }}RepositoryMockRecorder) Get{{ .Name | title
 }
 
 // GetAll{{ .Name | title }} mocks base method.
-func (m *MockGorm{{ .Name | title }}Repository) GetAll{{ .Name | title }}(query map[string]string, order string, offset, limit int) ([]{{ .Name | toLower }}.{{ .Name | title }}, error) {
+func (m *MockGorm{{ .Name | title }}Repository) GetAll{{ .Name | title }}(query map[string]interface{}, order string, offset, limit int) ([]{{ .Name | toLower }}.{{ .Name | title }}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll{{ .Name | title }}", query, order, offset, limit)
 	ret0, _ := ret[0].([]{{ .Name | toLower }}.{{ .Name | title }})
