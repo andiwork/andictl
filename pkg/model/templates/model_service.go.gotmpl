@@ -14,6 +14,9 @@ func Get{{ .Name | title }}ByIdService(id uuid.UUID, repo Gorm{{ .Name | title }
 
 func GetAll{{ .Name | title }}Service(query map[string]interface{}, order string,
 	offset int, limit int, repo Gorm{{ .Name | title }}Repository) (models []{{ .Name | title }}, err error) {
+	if order == "" {
+		order = "created_at desc"
+	}	
 	return repo.GetAll{{ .Name | title }}(query, order, offset, limit)
 }
 

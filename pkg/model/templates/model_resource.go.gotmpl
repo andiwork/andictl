@@ -135,9 +135,6 @@ func (u {{ .Name | title }}Resource) findAll{{ .Name | title }}s(request *restfu
 	offset, _ := strconv.Atoi(request.QueryParameter("offset"))
 	limit, _ := strconv.Atoi(request.QueryParameter("limit"))
 	order := request.QueryParameter("order")
-	if order == "" {
-		order = "created_at desc"
-	}
 	list, err := GetAll{{ .Name | title }}Service(query, order, offset, limit, repo{{ .Name | title }})
 	if err != nil {
 		response.WriteError(http.StatusInternalServerError, err)
@@ -162,8 +159,8 @@ func (u {{ .Name | title }}Resource) find{{ .Name | title }}(request *restful.Re
 //
 func (u *{{ .Name | title }}Resource) update{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	var {{ .Name | title }} {{ .Name | title }}
-	err := request.ReadEntity(&{{ .Name | title }})
-	err = Update{{ .Name | title }}ByIdService(&{{ .Name | title }}, repo{{ .Name | title }})
+	request.ReadEntity(&{{ .Name | title }})
+	err := Update{{ .Name | title }}ByIdService(&{{ .Name | title }}, repo{{ .Name | title }})
 	if err == nil {
 		response.WriteEntity({{ .Name | title }})
 	} else {
@@ -175,8 +172,8 @@ func (u *{{ .Name | title }}Resource) update{{ .Name | title }}(request *restful
 //
 func (u *{{ .Name | title }}Resource) create{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	{{ .Name | toLower }} := {{ .Name | title }}{}
-	err := request.ReadEntity(&{{ .Name | toLower }})
-	Add{{ .Name | title }}Service(&{{ .Name | toLower }}, repo{{ .Name | title }})
+	request.ReadEntity(&{{ .Name | toLower }})
+	err := Add{{ .Name | title }}Service(&{{ .Name | toLower }}, repo{{ .Name | title }})
 	if err == nil {
 		response.WriteHeaderAndEntity(http.StatusCreated, {{ .Name | toLower }})
 	} else {
