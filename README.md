@@ -1,7 +1,7 @@
 # andictl
 
 ## Overview
-
+This is tool for generating golang  basic project with no dependency on any framework.
 ## Getting Started
 ### Installation
 Installation from source 
@@ -24,6 +24,7 @@ chmod +x /usr/local/bin/andictl
 - Copier : https://github.com/jinzhu/copier
 
 ## Todos
+* [ ] Handle Gorm mysql uuid ID
 * [ ] Fix ctrl + c bug. Intercept the os.Signal
 * [ ] Generate model with more fields
 * [ ] Exclude tests package in generate model package list
