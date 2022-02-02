@@ -146,23 +146,23 @@ func (u {{ .Name | title }}Resource) findAll{{ .Name | title }}s(request *restfu
 //
 func (u {{ .Name | title }}Resource) find{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	uuid, _ := uuid.Parse(request.PathParameter("id"))
-	{{ .Name | title }}, err := Get{{ .Name | title }}ByIdService(uuid, repo{{ .Name | title }})
+	{{ .Name | toLower }}, err := Get{{ .Name | title }}ByIdService(uuid, repo{{ .Name | title }})
 
 	if err == gorm.ErrRecordNotFound {
 		response.WriteErrorString(http.StatusNotFound, "{{ .Name | title }} could not be found.")
 	} else {
-		response.WriteEntity({{ .Name | title }})
+		response.WriteEntity({{ .Name | toLower }})
 	}
 }
 
 // PUT http://localhost:8080/{{ .Name | toLower }}s
 //
 func (u *{{ .Name | title }}Resource) update{{ .Name | title }}(request *restful.Request, response *restful.Response) {
-	var {{ .Name | title }} {{ .Name | title }}
+	var {{ .Name | toLower }} {{ .Name | title }}
 	request.ReadEntity(&{{ .Name | title }})
 	err := Update{{ .Name | title }}ByIdService(&{{ .Name | title }}, repo{{ .Name | title }})
 	if err == nil {
-		response.WriteEntity({{ .Name | title }})
+		response.WriteEntity({{ .Name | toLower }})
 	} else {
 		response.WriteError(http.StatusInternalServerError, err)
 	}
