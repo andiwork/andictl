@@ -159,8 +159,8 @@ func (u {{ .Name | title }}Resource) find{{ .Name | title }}(request *restful.Re
 //
 func (u *{{ .Name | title }}Resource) update{{ .Name | title }}(request *restful.Request, response *restful.Response) {
 	var {{ .Name | toLower }} {{ .Name | title }}
-	request.ReadEntity(&{{ .Name | title }})
-	err := Update{{ .Name | title }}ByIdService(&{{ .Name | title }}, repo{{ .Name | title }})
+	request.ReadEntity(&{{ .Name | title | toLower }})
+	err := Update{{ .Name | title }}ByIdService(&{{ .Name | title | toLower}}, repo{{ .Name | title }})
 	if err == nil {
 		response.WriteEntity({{ .Name | toLower }})
 	} else {
