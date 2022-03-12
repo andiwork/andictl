@@ -1,0 +1,11 @@
+package configs
+
+import (
+	restful "github.com/emicklei/go-restful/v3"
+)
+
+func CustomRestfulWebservice() (webs []*restful.WebService) {
+	// Append all your custom restful services
+	// webs = append(webs, package.NewDummyResource().WebService())
+	return webs
+}

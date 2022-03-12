@@ -41,3 +41,5 @@ var dbSingletionTmpl embed.FS
 //go:embed templates/custom_gorm.go.gotmpl
 var customGormGoTmpl embed.FS
 
+//go:embed templates/custom_restful.go.gotmpl
+var customRestfulGoTmpl embed.FS

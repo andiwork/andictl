@@ -11,6 +11,12 @@ var apiDocsPath = "/apidocs/"
 func InitWebservices() {
 	//andi-add-restful-webservice
 
+
+	// Register custom webservicess
+	for _, webs := range CustomRestfulWebservice() {
+		restful.DefaultContainer.Add(webs)
+	}
+	
 	// Get swagger configurations
 	config, cors := newSwaggerConf()
 	restful.DefaultContainer.Add(restfulspec.NewOpenAPIService(config))
