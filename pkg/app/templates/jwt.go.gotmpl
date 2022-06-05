@@ -8,10 +8,13 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	restful "github.com/emicklei/go-restful/v3"
 	"github.com/spf13/viper"
+	iam "github.com/andiwork/akouendy-accounts-sdk"
+
 )
 
 var (
 	jwtkey  []byte
+	UserId string
 )
 
 func init() {
@@ -68,6 +71,17 @@ func AuthJWT(req *restful.Request, resp *restful.Response, chain *restful.Filter
 			for k, v := range claims {
 				log.Println("claims k,v :", k, v)
 			}
+		}
+
+		UserId = claims["sub"].(string)
+		_, ok := claims["admin"]
+		if !ok {
+			user, err := iam.GetUserId(UserId, authHeader, viper.GetString("user-profile-url"))
+			if err != nil {
+				resp.WriteErrorString(401, "401: Not Authorized")
+				return
+			}
+			UserId = user.PublicID
 		}
 
 	}

@@ -5,6 +5,7 @@ import (
 )
 
 func Add{{ .Name | title }}Service(m *{{ .Name | title }}, repo Gorm{{ .Name | title }}Repository) (err error) {
+	m.CreatedBy = middleware.UserId
 	return repo.Add{{ .Name | title }}(m)
 }
 
