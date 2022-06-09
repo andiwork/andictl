@@ -1,0 +1,20 @@
+[Unit]
+Description={{ .modName }}
+After=network.target
+
+[Service]
+Type=simple
+User={{ .modName }}
+Group={{ .modName }}
+
+Restart=on-failure
+RestartSec=10
+StartLimitIntervalSec=60
+
+WorkingDirectory=/opt/andi/{{ .modName }}
+ExecStart=/opt/andi/{{ .modName }}
+StandardOutput=file:/var/log/{{ .modName }}.log
+StandardError=file:/var/log/{{ .modName }}-errors.log
+
+[Install]
+WantedBy=multi-user.target
