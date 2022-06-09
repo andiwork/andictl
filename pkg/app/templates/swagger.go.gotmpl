@@ -134,12 +134,14 @@ func enrichSwaggeerObjectSecurity(swo *spec.Swagger) {
 {{ end }}
 func swaggerHandler(w http.ResponseWriter, req *http.Request) {
 	// remove/add not default ports from req.Host == req.URL.Path
-	openapi := "http://" + req.Host
+	httpScheme := viper.GetString("protocol")
+	openapi := httpScheme + "://" + req.Host
 	/*
 		if len(req.URL.RawQuery) > 0 {
 			target += "?" + req.URL.RawQuery
 		}
 	*/
-	url := "http://" + req.Host + apiDocsPath + "?url=" + openapi + "/apidocs.json"
+	url := httpScheme + "://" + req.Host + apiDocsPath + "?url=" + openapi + "/apidocs.json"
 	http.Redirect(w, req, url, http.StatusTemporaryRedirect)
 }
+

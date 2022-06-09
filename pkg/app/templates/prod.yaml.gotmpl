@@ -1,5 +1,6 @@
 name:  "{{.App.Name}}"
 port:  {{.App.Port}}
+protocol: "https"
 devmode: false
 auth: {{.App.Auth }}
 {{ if .App.Auth }}{{.App.AuthType}}: {{ uuidWithOutHyphen }}{{ end }}
