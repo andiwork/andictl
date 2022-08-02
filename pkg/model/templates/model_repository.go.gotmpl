@@ -10,6 +10,7 @@ import (
 type Gorm{{ .Name | title }}Repository interface {
 	Add{{ .Name | title }}(m *{{ .Name | title }}) (err error)
 	Get{{ .Name | title }}ById(id uuid.UUID) (model {{ .Name | title }}, err error)
+	Get{{ .Name | title }}ByFields(query {{ .Name | title }}) (model {{ .Name | title }}, err error)
 	GetAll{{ .Name | title }}(query map[string]interface{}, order string,
 		offset int, limit int) (models []{{ .Name | title }}, err error)
 	Update{{ .Name | title }}ById(model *{{ .Name | title }}) (err error)
@@ -67,5 +68,11 @@ func (r {{ .Name | title }}Repository) Delete{{ .Name | title }}(id uuid.UUID) (
 func (r {{ .Name | title }}Repository) BatchInsert{{ .Name | title }}(models []{{ .Name | title }}) (err error) {
 	db := utils.GetInstance().GetDB()
 	err = db.Create(&models).Error
+	return
+}
+
+func (r {{ .Name | title }}Repository) Get{{ .Name | title }}ByFields(query {{ .Name | title }}) (model {{ .Name | title }}, err error) {
+	db := utils.GetInstance().GetDB()
+	err = db.Where(query).First(&model).Error
 	return
 }

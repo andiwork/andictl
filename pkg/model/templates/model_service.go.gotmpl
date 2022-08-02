@@ -32,3 +32,7 @@ func BatchInsert{{ .Name | title }}Service(models []{{ .Name | title }}, repo  G
 	return repo.BatchInsert{{ .Name | title }}(models)
 }
 
+func Get{{ .Name | title }}ByFieldsService(query {{ .Name | title }}, repo  Gorm{{ .Name | title }}Repository) (model {{ .Name | title }}, err error) {
+	return repo.Get{{ .Name | title }}ByFieldsService(query {{ .Name | title }})
+}
+
