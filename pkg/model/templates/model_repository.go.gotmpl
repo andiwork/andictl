@@ -42,7 +42,7 @@ func (r {{ .Name | title }}Repository) GetAll{{ .Name | title }}(query map[strin
 	offset int, limit int) (models []{{ .Name | title }}, err error) {
 	log.Println("query :", query, " order:", order, " limit:", limit, "offset:", offset)
 	db := utils.GetInstance().GetDB()
-	err = db.Where(query).Order(order).
+	err = db.Where(query).Where("owned_by = ?", middleware.UserId).Order(order).
 		Limit(limit).Offset(offset).
 		Find(&models).Error
 	return
@@ -73,6 +73,6 @@ func (r {{ .Name | title }}Repository) BatchInsert{{ .Name | title }}(models []{
 
 func (r {{ .Name | title }}Repository) Get{{ .Name | title }}ByFields(query {{ .Name | title }}) (model {{ .Name | title }}, err error) {
 	db := utils.GetInstance().GetDB()
-	err = db.Where(query).First(&model).Error
+	err = db.Where(query).Where("owned_by = ?", middleware.UserId).First(&model).Error
 	return
 }
