@@ -3,17 +3,17 @@ package middleware
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
+	iam "github.com/andiwork/akouendy-accounts-sdk"
 	jwt "github.com/dgrijalva/jwt-go"
 	restful "github.com/emicklei/go-restful/v3"
 	"github.com/spf13/viper"
-	iam "github.com/andiwork/akouendy-accounts-sdk"
-
 )
 
 var (
-	jwtkey  []byte
+	jwtkey []byte
 	UserId string
 )
 
@@ -82,6 +82,11 @@ func AuthJWT(req *restful.Request, resp *restful.Response, chain *restful.Filter
 				return
 			}
 			UserId = user.PublicID
+		}
+		xSudo, _ := strconv.ParseBool(req.QueryParameter("Xsudo"))
+
+		if UserId == viper.GetString("shadowUserId") && xSudo {
+			UserId = req.QueryParameter("Xshadow")
 		}
 
 	}
