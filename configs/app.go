@@ -1,6 +1,9 @@
 package configs
 
+import "github.com/google/uuid"
+
 type Application struct {
+	AppId        uuid.UUID
 	Type         string // application type api, front
 	Name         string // application name
 	Auth         bool   // secure application api true|false
