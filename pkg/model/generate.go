@@ -1,6 +1,7 @@
 package model
 
 import (
+	"embed"
 	"fmt"
 	"os"
 	"reflect"
@@ -17,6 +18,8 @@ type TemplateData struct {
 
 var (
 	appModule string
+	//go:embed templates/*
+	content embed.FS
 )
 
 func Generate(model configs.AndiModel) {
@@ -40,16 +43,16 @@ func Generate(model configs.AndiModel) {
 		os.MkdirAll(packPath, os.ModePerm)
 
 		// Generate model files
-		data, _ := modelGoTmpl.ReadFile("templates/model.go.gotmpl")
+		data, _ := content.ReadFile("templates/model.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, modelSlug+"_model.go", data, model, false)
 
-		data, _ = modelResourceGoTmpl.ReadFile("templates/model_resource.go.gotmpl")
+		data, _ = content.ReadFile("templates/model_resource.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, modelSlug+"_resource.go", data, model, false)
 
-		data, _ = modelServiceGoTmpl.ReadFile("templates/model_service.go.gotmpl")
+		data, _ = content.ReadFile("templates/model_service.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, modelSlug+"_service.go", data, model, false)
 
-		data, _ = modelRepositoryGoTmpl.ReadFile("templates/model_repository.go.gotmpl")
+		data, _ = content.ReadFile("templates/model_repository.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, modelSlug+"_repository.go", data, model, false)
 
 		// register  models in package init.go
@@ -64,7 +67,7 @@ func Generate(model configs.AndiModel) {
 		allModels = append(allModels, newModel)
 		//==> add new model to register
 		templateData := TemplateData{First: registerModels[0], Data: registerModels}
-		data, _ = initGoTmpl.ReadFile("templates/init.go.gotmpl")
+		data, _ = content.ReadFile("templates/init.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, "init.go", data, templateData, false)
 
 		//==> import new package in gorm.go
@@ -72,24 +75,24 @@ func Generate(model configs.AndiModel) {
 		packages := GetDistinctElementInConf("models", "package")
 		//add current package to the existing
 		packages[model.Package] = appModule
-		data, _ = gormMigrateTmpl.ReadFile("templates/gorm.go.gotmpl")
+		data, _ = content.ReadFile("templates/gorm.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "gorm.go", data, packages, false)
 
 		//=> import new package and create service in restful.go
 		templateData = TemplateData{First: packages, Data: allModels}
-		data, _ = restfulWebserviceGoTmpl.ReadFile("templates/restful.go.gotmpl")
+		data, _ = content.ReadFile("templates/restful.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "restful.go", data, templateData, false)
 
 		// create model test case
 		testsPath := configs.AppDir + "pkg/tests"
 		os.MkdirAll(testsPath, os.ModePerm)
-		data, _ = serviceTestGoTmpl.ReadFile("templates/model_service_test.go.gotmpl")
+		data, _ = content.ReadFile("templates/model_service_test.go.gotmpl")
 		utils.ProcessTmplFiles(testsPath, modelSlug+"_service_test.go", data, model, false)
 
-		data, _ = mockModelRepoGoTmpl.ReadFile("templates/mock_model_repository.go.gotmpl")
+		data, _ = content.ReadFile("templates/mock_model_repository.go.gotmpl")
 		utils.ProcessTmplFiles(testsPath, "mock_"+modelSlug+"_repository.go", data, model, false)
 
-		data, _ = testReadMdTmpl.ReadFile("templates/README.md.gotmpl")
+		data, _ = content.ReadFile("templates/README.md.gotmpl")
 		utils.ProcessTmplFiles(testsPath, "README.md", data, model, false)
 
 		//Update andi.yaml with new model
