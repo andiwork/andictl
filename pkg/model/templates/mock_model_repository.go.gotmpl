@@ -78,6 +78,21 @@ func (mr *MockGorm{{ .Name | title }}RepositoryMockRecorder) Delete{{ .Name | ti
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete{{ .Name | title }}", reflect.TypeOf((*MockGorm{{ .Name | title }}Repository)(nil).Delete{{ .Name | title }}), id)
 }
 
+// Get{{ .Name | title }}ByFields mocks base method.
+func (m *MockGorm{{ .Name | title }}Repository) Get{{ .Name | title }}ByFields(query client.{{ .Name | title }}) ([]client.{{ .Name | title }}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get{{ .Name | title }}ByFields", query)
+	ret0, _ := ret[0].([]client.{{ .Name | title }})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get{{ .Name | title }}ByFields indicates an expected call of Get{{ .Name | title }}ByFields.
+func (mr *MockGorm{{ .Name | title }}RepositoryMockRecorder) Get{{ .Name | title }}ByFields(query interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get{{ .Name | title }}ByFields", reflect.TypeOf((*MockGorm{{ .Name | title }}Repository)(nil).Get{{ .Name | title }}ByFields), query)
+}
+
 // Get{{ .Name | title }}ById mocks base method.
 func (m *MockGorm{{ .Name | title }}Repository) Get{{ .Name | title }}ById(id uuid.UUID) ({{ .Name | toLower }}.{{ .Name | title }}, error) {
 	m.ctrl.T.Helper()

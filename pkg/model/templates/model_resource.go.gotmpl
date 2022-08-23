@@ -97,8 +97,8 @@ func (u {{ .Name | title }}Resource) WebService() *restful.WebService {
 		// docs
 		Doc("create a {{ .Name | title }}").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
-		Reads({{ .Name | title }}{})
-		Returns(200, "OK", {{ .Name | title }}{}))) // from the request
+		Reads({{ .Name | title }}{}).
+		Returns(200, "OK", {{ .Name | title }}{})) // from the request
 
 	ws.Route(ws.DELETE("/{id}").To(u.remove{{ .Name | title }}).
 		//Authorization middleware. To be implemented
@@ -139,7 +139,7 @@ func (u {{ .Name | title }}Resource) findAll{{ .Name | title }}s(request *restfu
 		limit = 50
 	}
 	order := request.QueryParameter("order")
-	list, err := GetAll{{ .Name | title }}Service(query, order, offset, limit, repo{{ .Name | title }})
+	list, err := CacheGetAll{{ .Name | title }}Service(query, order, offset, limit, repo{{ .Name | title }})
 	if err != nil {
 		response.WriteError(http.StatusInternalServerError, err)
 	}

@@ -1,0 +1,23 @@
+package {{ .Package }}
+import (
+	"{{.Module}}/pkg/middleware"
+	"{{.Module}}/utils"
+	"encoding/json"
+    "fmt"
+    "time"
+)
+
+func CacheGetAll{{ .Name | title }}Service(query map[string]interface{}, order string,
+	offset int, limit int, repo Gorm{{ .Name | title }}Repository) (models []{{ .Name | title }}, err error) {
+    c := utils.GetCache()
+	label := middleware.UserId + "_{{ .Name | toLower }}_all_" + fmt.Sprint(limit) + fmt.Sprint(offset)
+	item, found := c.Get(label)
+	if found {
+		json.Unmarshal(item.([]byte), &models)
+	} else {
+		models, err = GetAll{{ .Name | title }}Service(query, order, offset, limit, repo)
+		data, _ := json.Marshal(models)
+		c.Set(label, data, 2*time.Minute)
+	}
+    return
+}

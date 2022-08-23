@@ -55,6 +55,9 @@ func Generate(model configs.AndiModel) {
 		data, _ = content.ReadFile("templates/model_repository.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, modelSlug+"_repository.go", data, model, false)
 
+		data, _ = content.ReadFile("templates/model_cache_service.go.gotmpl")
+		utils.ProcessTmplFiles(packPath, modelSlug+"_cache_service.go", data, model, false)
+
 		// register  models in package init.go
 		registerModels := make([]map[interface{}]interface{}, 1)
 		allModels := make([]map[interface{}]interface{}, 1)

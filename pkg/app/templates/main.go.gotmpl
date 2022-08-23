@@ -24,5 +24,6 @@ func main() {
 	log.Printf("Starting server at port %s\n.", app.Port)
 	log.Printf("Swagger documentation at http://127.0.0.1:%s/swagger", app.Port)
 	server := &http.Server{Addr: ":" + app.Port}
+	http.Handle("/health", utils.GetAppCheckerHandler())
 	log.Fatal(server.ListenAndServe())
 }

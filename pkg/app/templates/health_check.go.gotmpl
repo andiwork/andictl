@@ -1,0 +1,52 @@
+package utils
+
+import (
+	"net/http"
+
+	healthcheck "github.com/andiwork/go-healthcheck"
+)
+
+func GetAppCheckerHandler() http.HandlerFunc {
+	db, _ := GetInstance().GetDB().DB()
+	checkerConfig := healthcheck.InitChecker()
+	checkerConfig.AddDatabaseCheck(db)
+
+	// Add new check
+
+	// A check configuration to see if our database connection is up.
+	// The check function will be executed for each HTTP request.
+	/*
+		checkerConfig.AddCheck(health.WithCheck(health.Check{
+			Name:    "www.google.fr", // A unique check name.
+			Timeout: 2 * time.Second, // A check specific timeout.
+			Check:   healthcheck.TCPDialCheck("www.google.fr:443", 1*time.Second),
+		}))
+	*/
+
+	/*
+		userProfileUrl := "user-profile-url"
+		checkerConfig.AddCheck(health.WithCheck(health.Check{
+			Name:    userProfileUrl,  // A unique check name.
+			Timeout: 2 * time.Second, // A check specific timeout.
+			Check:   healthcheck.HTTPGetCheck(viper.GetString(userProfileUrl), 1*time.Second),
+		}))
+
+	*/
+	// The following check will be executed periodically every 15 seconds
+	// started with an initial delay of 3 seconds. The check function will NOT
+	// be executed for each HTTP request.
+	/*
+		checkerConfig.AddCheck(health.WithPeriodicCheck(15*time.Second, 3*time.Second, health.Check{
+			Name: "periodical",
+			// The check function checks the health of a component. If an error is
+			// returned, the component is considered unavailable (or "down").
+			// The context contains a deadline according to the configured timeouts.
+			Check: func(ctx context.Context) error {
+				fmt.Println("This is a periodical check")
+				return nil
+			},
+		}))
+	*/
+
+	return checkerConfig.GetCheckerHandler()
+}

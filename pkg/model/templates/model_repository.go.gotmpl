@@ -3,6 +3,7 @@ package {{.Package}}
 import (
 	"log"
 	"{{.Module}}/utils"
+	"{{.Module}}/pkg/middleware"
 	"github.com/google/uuid"
 )
 
@@ -10,12 +11,12 @@ import (
 type Gorm{{ .Name | title }}Repository interface {
 	Add{{ .Name | title }}(m *{{ .Name | title }}) (err error)
 	Get{{ .Name | title }}ById(id uuid.UUID) (model {{ .Name | title }}, err error)
-	Get{{ .Name | title }}ByFields(query {{ .Name | title }}) (model {{ .Name | title }}, err error)
 	GetAll{{ .Name | title }}(query map[string]interface{}, order string,
 		offset int, limit int) (models []{{ .Name | title }}, err error)
 	Update{{ .Name | title }}ById(model *{{ .Name | title }}) (err error)
 	Delete{{ .Name | title }}(id uuid.UUID) (err error)
 	BatchInsert{{ .Name | title }}(models []{{ .Name | title }}) (err error)
+	Get{{ .Name | title }}ByFields(query {{ .Name | title }}) (models []{{ .Name | title }}, err error)
 }
 
 type {{ .Name | title }}Repository struct {}
@@ -71,8 +72,8 @@ func (r {{ .Name | title }}Repository) BatchInsert{{ .Name | title }}(models []{
 	return
 }
 
-func (r {{ .Name | title }}Repository) Get{{ .Name | title }}ByFields(query {{ .Name | title }}) (model {{ .Name | title }}, err error) {
+func (r {{ .Name | title }}Repository) Get{{ .Name | title }}ByFields(query {{ .Name | title }}) (models []{{ .Name | title }}, err error) {
 	db := utils.GetInstance().GetDB()
-	err = db.Where(query).Where("owned_by = ?", middleware.UserId).First(&model).Error
+	err = db.Where(query).Where("owned_by = ?", middleware.UserId).Find(&models).Error
 	return
 }

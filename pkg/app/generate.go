@@ -103,6 +103,12 @@ func Generate() {
 	data, _ := content.ReadFile("templates/db_singleton.go.gotmpl")
 	utils.ProcessTmplFiles(configs.AppDir+"utils", "db_singleton.go", data, nil, false)
 
+	data, _ = content.ReadFile("templates/cache_singleton.go.gotmpl")
+	utils.ProcessTmplFiles(configs.AppDir+"utils", "cache_singleton.go", data, nil, false)
+
+	data, _ = content.ReadFile("templates/health_check.go.gotmpl")
+	utils.ProcessTmplFiles(configs.AppDir+"utils", "health_check.go", data, nil, false)
+
 	if configs.AppConfs.App.AuthType == "jwt" {
 		go func() {
 			wg.Add(1)
