@@ -21,7 +21,6 @@ import (
 
 	"github.com/andiwork/andictl/configs"
 	"github.com/andiwork/andictl/pkg/app"
-	"github.com/google/uuid"
 	slugify "github.com/metal3d/go-slugify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -59,7 +58,6 @@ var rootCmd = &cobra.Command{
 					viper.Set("application.name", appName)
 					viper.Set("application.type", answers.Type)
 					viper.Set("application.port", answers.Port)
-					viper.Set("application.app-id", uuid.New().String())
 					viper.Set("application.database-type", answers.DatabaseType)
 					if answers.AuthType != "none" {
 						viper.Set("application.auth", true)

@@ -2,8 +2,8 @@ name:  "{{.App.Name}}"
 port:  {{.App.Port}}
 protocol: "http"
 devmode: true
-app-id: {{.App.AppId}}
-shadowUserId: 8426283f633daa9bc4c041a6f31aeb05
+app-id: {{ uuidNew }}
+shadowUserId: {{ uuidWithOutHyphen }}
 auth: {{.App.Auth }}
 {{ if .App.Auth }}{{.App.AuthType}}: {{ uuidWithOutHyphen }}{{ end }}
 database:

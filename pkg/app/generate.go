@@ -1,6 +1,7 @@
 package app
 
 import (
+	"embed"
 	"fmt"
 	"os"
 	"sync"
@@ -10,6 +11,9 @@ import (
 )
 
 var wg sync.WaitGroup
+
+//go:embed templates/*
+var content embed.FS
 
 func Generate() {
 
@@ -47,10 +51,10 @@ func Generate() {
 	//Generate main.go
 	wg.Add(1)
 	go func() {
-		data, _ := mainGoTmpl.ReadFile("templates/main.go.gotmpl")
+		data, _ := content.ReadFile("templates/main.go.gotmpl")
 		utils.ProcessTmplFiles(configs.AppDir, "main.go", data, configs.AppConfs, false)
 
-		data, _ = gitignoreTmpl.ReadFile("templates/gitignore.gotmpl")
+		data, _ = content.ReadFile("templates/gitignore.gotmpl")
 		utils.ProcessTmplFiles(configs.AppDir, ".gitignore", data, configs.AppConfs, false)
 		wg.Done()
 	}()
@@ -60,51 +64,51 @@ func Generate() {
 	confDir := configs.AppDir + "configs"
 	go func() {
 		wg.Add(1)
-		data, _ := appTmpl.ReadFile("templates/app.yaml.gotmpl")
+		data, _ := content.ReadFile("templates/app.yaml.gotmpl")
 		utils.ProcessTmplFiles(confDir, "app.yaml", data, configs.AppConfs, false)
 
-		data, _ = prodTmpl.ReadFile("templates/prod.yaml.gotmpl")
+		data, _ = content.ReadFile("templates/prod.yaml.gotmpl")
 		utils.ProcessTmplFiles(confDir, "prod.yaml", data, configs.AppConfs, false)
 		wg.Done()
 	}()
 	go func() {
 		wg.Add(1)
-		data, _ := appGoTmpl.ReadFile("templates/app.go.gotmpl")
+		data, _ := content.ReadFile("templates/app.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "app.go", data, configs.AppConfs, false)
 
-		data, _ = gormGoTmpl.ReadFile("templates/gorm.go.gotmpl")
+		data, _ = content.ReadFile("templates/gorm.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "gorm.go", data, configs.AppConfs, false)
 
-		data, _ = customGormGoTmpl.ReadFile("templates/custom_gorm.go.gotmpl")
+		data, _ = content.ReadFile("templates/custom_gorm.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "custom_gorm.go", data, configs.AppConfs, false)
 
-		data, _ = customRestfulGoTmpl.ReadFile("templates/custom_restful.go.gotmpl")
+		data, _ = content.ReadFile("templates/custom_restful.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "custom_restful.go", data, configs.AppConfs, false)
 
 		wg.Done()
 	}()
 	go func() {
 		wg.Add(1)
-		data, _ := restfulGoTmpl.ReadFile("templates/restful.go.gotmpl")
+		data, _ := content.ReadFile("templates/restful.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "restful.go", data, configs.AppConfs, false)
 
-		data, _ = swaggerGoTmpl.ReadFile("templates/swagger.go.gotmpl")
+		data, _ = content.ReadFile("templates/swagger.go.gotmpl")
 		utils.ProcessTmplFiles(confDir, "swagger.go", data, configs.AppConfs, false)
-		data, _ = authzGoTmpl.ReadFile("templates/authz.go.gotmpl")
+		data, _ = content.ReadFile("templates/authz.go.gotmpl")
 		utils.ProcessTmplFiles(configs.AppDir+"pkg/middleware", "authz.go", data, nil, false)
 		wg.Done()
 	}()
 
 	os.MkdirAll(configs.AppDir+"utils", os.ModePerm)
-	data, _ := dbSingletionTmpl.ReadFile("templates/db_singleton.go.gotmpl")
+	data, _ := content.ReadFile("templates/db_singleton.go.gotmpl")
 	utils.ProcessTmplFiles(configs.AppDir+"utils", "db_singleton.go", data, nil, false)
 
 	if configs.AppConfs.App.AuthType == "jwt" {
 		go func() {
 			wg.Add(1)
-			data, _ := jwtGoTmpl.ReadFile("templates/jwt.go.gotmpl")
+			data, _ := content.ReadFile("templates/jwt.go.gotmpl")
 			utils.ProcessTmplFiles(configs.AppDir+"pkg/middleware", "jwt.go", data, nil, false)
-			data, _ = swaggerHelperGoTmpl.ReadFile("templates/swagger_helper.go.gotmpl")
+			data, _ = content.ReadFile("templates/swagger_helper.go.gotmpl")
 			utils.ProcessTmplFiles(configs.AppDir+"utils", "swagger_helper.go", data, nil, false)
 			wg.Done()
 		}()
