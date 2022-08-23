@@ -73,6 +73,9 @@ func Generate(model configs.AndiModel) {
 		data, _ = content.ReadFile("templates/init.go.gotmpl")
 		utils.ProcessTmplFiles(packPath, "init.go", data, templateData, false)
 
+		data, _ = content.ReadFile("templates/type.go.gotmpl")
+		utils.ProcessTmplFiles(packPath, "type.go", data, templateData, false)
+
 		//==> import new package in gorm.go
 		confDir := configs.AppDir + "configs"
 		packages := GetDistinctElementInConf("models", "package")
