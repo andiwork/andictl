@@ -32,6 +32,8 @@ chmod +x /usr/local/bin/andictl
 * [ ] Update unit tests
 * [ ] Cron generator
 * [ ] Pack final package
+* [ ] Add mage from https://magefile.org
+* [ ] Add asdf from https://asdf-vm.com
 
 ## License
 
