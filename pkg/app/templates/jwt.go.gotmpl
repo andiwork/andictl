@@ -22,13 +22,7 @@ func init() {
 }
 
 // Check whether token is valid
-func checkToken(tokenString string) (bool, jwt.MapClaims) {
-
-	kv := strings.Split(tokenString, " ")
-	if len(kv) != 2 || kv[0] != "Bearer" {
-		return false, nil
-	}
-
+func checkToken(kv []string) (bool, jwt.MapClaims) {
 	claims := jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(kv[1], claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtkey), nil
@@ -62,7 +56,16 @@ func checkToken(tokenString string) (bool, jwt.MapClaims) {
 }
 func AuthJWT(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
 	authHeader := req.HeaderParameter("Authorization")
-	b, claims := checkToken(authHeader)
+	if viper.GetBool("devmode") {
+		log.Println("Jwt token received:", authHeader)
+	}
+
+	authHeaderSlice := strings.Split(authHeader, " ")
+	if len(authHeaderSlice) != 2 || authHeaderSlice[0] != "Bearer" || len(authHeaderSlice[1]) < 10{
+		resp.WriteErrorString(401, "401: Bad request. Provide token in format : Bearer TokenYXJKSMMM")
+		return
+	}
+	b, claims := checkToken(authHeaderSlice)
 	if !b {
 		resp.WriteErrorString(401, "401: Not Authorized")
 		return
