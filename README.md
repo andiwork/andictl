@@ -23,9 +23,13 @@ chmod +x /usr/local/bin/andictl
 - GoReleaser
 - Copier : https://github.com/jinzhu/copier
 
+## Known Issues
+* [ ] Do not create ./pkg/__model__/type.go file if  exist
+* [ ] Fix ctrl + c bug. Intercept the os.Signal
+* [ ] Replace factory Register to FactoryRegister to avoid duplication
+
 ## Todos
 * [ ] Handle Gorm mysql uuid ID
-* [ ] Fix ctrl + c bug. Intercept the os.Signal
 * [ ] Generate model with more fields
 * [ ] Exclude tests package in generate model package list
 * [ ] download air
