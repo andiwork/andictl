@@ -40,6 +40,10 @@ chmod +x /usr/local/bin/andictl
 * [ ] Add asdf from https://asdf-vm.com
 * [ ] Add GetAllRegistered function in factory generator
 
+## To benchmark
+* [ ] Service Weaver at https://opensource.googleblog.com/2023/03/introducing-service-weaver-framework-for-writing-distributed-applications.html and https://serviceweaver.dev/
+* [ ] Dapr at  https://github.com/dapr
+
 ## License
 
 © James Kokou GAGLO, 2021~time.Now
