@@ -26,7 +26,8 @@ chmod +x /usr/local/bin/andictl
 ## Known Issues
 * [ ] Do not create ./pkg/__model__/type.go file if  exist
 * [ ] Fix ctrl + c bug. Intercept the os.Signal
-* [ ] Replace factory Register to FactoryRegister to avoid duplication
+* [ ] Replace factory Register with FactoryRegister to avoid duplication
+* [ ] Create DTO interface for creation resource to avoid issue due to non mandatory or generated fields. Use the DTO type to make composition for model type to avoid fields duplication. Use the DTO type to make composition for model type to avoid fields duplication
 
 ## Todos
 * [ ] Handle Gorm mysql uuid ID
